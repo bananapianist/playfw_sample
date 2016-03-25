@@ -1,0 +1,23 @@
+@(message: String, form1: Form[models.Tables.CustomerRow])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+
+@form1.errors.foreach { error =>
+  <div>@error.message</div>
+}
+
+@main("登録画面") {
+
+    <h1>登録画面</h1>
+    <p>@message</p>
+
+    @helper.form(action=routes.CustomerController.create) {
+		@views.html.customerform(form1)
+
+        <button>登録</button>
+    }
+
+   <p><a href="/customer">[一覧]</a></p>
+    <p><a href="/">[HOME]</a></p>
+}

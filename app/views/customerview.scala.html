@@ -1,0 +1,18 @@
+@(message: String, customers: List[models.Tables.CustomerRow])
+
+@main("一覧画面") {
+
+    <h1>一覧画面</h1>
+    <p>@message</p>
+
+    <ul id="notifyItems">
+    @for(customer <- customers) {
+        <li>
+       <a href="/edit/@customer.id">[編集]</a>
+        <a href="/remove/@customer.id">[削除]</a>
+         @customer.name @customer.email       </li>
+    }
+    </ul>
+
+    <p><a href="/">[HOME]</a></p>
+}
