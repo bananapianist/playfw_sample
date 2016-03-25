@@ -1,4 +1,5 @@
-@(message: String, form1: Form[models.Tables.CustomerRow])(implicit messages: Messages)
+@(message: String, form1: Form[models.Tables.CustomerRow])(implicit messages: Messages,request: RequestHeader)
+@import helper._
 
 @main("編集画面") {
 
@@ -7,6 +8,7 @@
 
     @helper.form(action=routes.CustomerController.update) {
         <input type="hidden" name="id" value="@form1("id").value">
+        @CSRF.formField
 		@views.html.customerform(form1)
         <button>更新</button>
     }

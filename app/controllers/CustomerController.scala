@@ -26,36 +26,49 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   /** This result directly redirect to the application home.*/
   val Home = Redirect(routes.CustomerController.index())
 
-  def index = Action.async { 
-    customerDao.all().map(customers => Ok(views.html.customerlist("", customers)))
+  def getToken = addToken(Action { implicit request =>
+    val Token(name, value) = CSRF.getToken.get
+    Ok(s"$name=$value")
+  })
+  
+  def index = addToken{
+    Action.async { 
+      customerDao.all().map(customers => Ok(views.html.customerlist("", customers)))
+    }
   }
-  def add = Action {
-    Ok(views.html.customerregist("", CustomerForm.form))
+  def add = addToken{
+    Action {implicit request =>
+      Ok(views.html.customerregist("", CustomerForm.form))
+    }
   }
   
-  def create = Action.async { implicit request =>
-    CustomerForm.form.bindFromRequest.fold(
-        formWithErrors => {
-          Logger.debug(formWithErrors.toString())
-          Future(BadRequest(views.html.customerregist("エラー", formWithErrors)))
-        },
-        customer => {
-          customerDao.create(customer).flatMap(cnt =>
-              //if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customerlist("登録しました", customers)))
-              if (cnt != 0) Future.successful(Redirect(routes.CustomerController.index))
-              else customerDao.all().map(notifications => BadRequest(views.html.customeredit("エラー", CustomerForm.form.fill(customer))))
-           )
-        }
-    )
+  def create = checkToken{
+    Action.async { implicit request =>
+      CustomerForm.form.bindFromRequest.fold(
+          formWithErrors => {
+            Logger.debug(formWithErrors.toString())
+            Future(BadRequest(views.html.customerregist("エラー", formWithErrors)))
+          },
+          customer => {
+            customerDao.create(customer).flatMap(cnt =>
+                //if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customerlist("登録しました", customers)))
+                if (cnt != 0) Future.successful(Redirect(routes.CustomerController.index))
+                else customerDao.all().map(notifications => BadRequest(views.html.customeredit("エラー", CustomerForm.form.fill(customer))))
+             )
+          }
+      )
+    }
   }
    
-  def edit(customerId: Long) = Action.async { 
-    customerDao.findById(customerId).flatMap(option =>
-      option match {
-        case Some(customer) => Future(Ok(views.html.customeredit("GET", CustomerForm.form.fill(customer))))
-        case None => customerDao.all().map(customers => BadRequest(views.html.customerlist("エラー", customers)))
-      }
-    )
+  def edit(customerId: Long) = addToken{
+    Action.async {implicit request =>
+      customerDao.findById(customerId).flatMap(option =>
+        option match {
+          case Some(customer) => Future(Ok(views.html.customeredit("GET", CustomerForm.form.fill(customer))))
+          case None => customerDao.all().map(customers => BadRequest(views.html.customerlist("エラー", customers)))
+        }
+      )
+    }
   }
 
   def update = checkToken {

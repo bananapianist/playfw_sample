@@ -12,3 +12,5 @@ project/project/*
 project/target/*
 project/.sbtserver
 bin/*
+/bin/
+.cache-tests
