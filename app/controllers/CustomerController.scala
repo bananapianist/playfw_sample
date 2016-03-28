@@ -2,11 +2,12 @@ package controllers
 
 import java.util.Date
 import scala.concurrent.Future
-import dao.CustomerDAO
 import javax.inject.Inject
+import dao._
 import models.Tables._
 import common._
 import forms._
+import views._
 import play.api._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc._
@@ -16,13 +17,13 @@ import skinny.util.JSONStringOps._
 import java.sql.Timestamp
 import org.joda.time.DateTime
 import org.joda.time.format._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{MessagesApi, I18nSupport}
+
 import play.filters.csrf._
 import play.filters.csrf.CSRF.Token
 
 
-class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, customerDao: CustomerDAO, CustomerForm:CustomerForm) extends Controller  {
+class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with I18nSupport  {
   /** This result directly redirect to the application home.*/
   val Home = Redirect(routes.CustomerController.index())
 
