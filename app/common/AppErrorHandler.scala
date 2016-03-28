@@ -9,9 +9,11 @@ import play.Logger
 class AppErrorHandler extends HttpErrorHandler {
 
   def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
+    Logger.debug("onClientError")
     Future.successful(
-        //Ok(errors.views.html.404())
-      Status(statusCode)("A client error occurred: " + message)
+        //Ok(errors.views.html.404notfound())
+      //Status(statusCode)("A client error occurred: " + message)
+      Status(statusCode)(views.html.errors.error404notfound(message))
     )
   }
 
