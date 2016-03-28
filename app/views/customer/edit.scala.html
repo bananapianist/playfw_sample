@@ -9,7 +9,7 @@
     @helper.form(action=routes.CustomerController.update) {
         <input type="hidden" name="id" value="@form1("id").value">
         @CSRF.formField
-		@views.html.customerform(form1)
+		@views.html.customer.form(form1)
         <button>更新</button>
     }
 
