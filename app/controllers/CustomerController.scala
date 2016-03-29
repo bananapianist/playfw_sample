@@ -4,7 +4,7 @@ import java.util.Date
 import scala.concurrent.Future
 import javax.inject.Inject
 import dao._
-import models.Tables._
+import models.TablesExtend._
 import common._
 import forms._
 import views._

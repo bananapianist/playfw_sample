@@ -4,12 +4,12 @@ import java.sql.Timestamp
 import java.util.Date
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
-object Tables extends {
+object TablesExtend extends {
   val profile = slick.driver.MySQLDriver
-} with Tables
+} with TablesExtend
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
-trait Tables {
+trait TablesExtend {
   val profile: slick.driver.JdbcProfile
   import profile.api._
   import slick.model.ForeignKeyAction
@@ -117,4 +117,98 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table PlayEvolutions */
   lazy val PlayEvolutions = new TableQuery(tag => new PlayEvolutions(tag))
+
+  /** Entity class storing rows of table Token
+   *  @param uuid Database column uuid SqlType(VARCHAR), Length(255,true)
+   *  @param email Database column email SqlType(VARCHAR), Length(255,true)
+   *  @param creationtime Database column creationTime SqlType(DATETIME)
+   *  @param expirationtime Database column expirationTime SqlType(DATETIME)
+   *  @param issignup Database column isSignUp SqlType(TINYINT) */
+  case class TokenRow(uuid: String, email: String, creationtime: Date, expirationtime: Date, issignup: Boolean)
+  /** GetResult implicit for fetching TokenRow objects using plain SQL queries */
+  implicit def GetResultTokenRow(implicit e0: GR[String], e1: GR[Date], e2: GR[Boolean]): GR[TokenRow] = GR{
+    prs => import prs._
+    TokenRow.tupled((<<[String], <<[String], <<[Date], <<[Date], <<[Boolean]))
+  }
+  /** Table description of table token. Objects of this class serve as prototypes for rows in queries. */
+  class Token(_tableTag: Tag) extends Table[TokenRow](_tableTag, "token") {
+    def * = (uuid, email, creationtime, expirationtime, issignup) <> (TokenRow.tupled, TokenRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(uuid), Rep.Some(email), Rep.Some(creationtime), Rep.Some(expirationtime), Rep.Some(issignup)).shaped.<>({r=>import r._; _1.map(_=> TokenRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column uuid SqlType(VARCHAR), Length(255,true) */
+    val uuid: Rep[String] = column[String]("uuid", O.Length(255,varying=true))
+    /** Database column email SqlType(VARCHAR), Length(255,true) */
+    val email: Rep[String] = column[String]("email", O.Length(255,varying=true))
+    /** Database column creationTime SqlType(DATETIME) */
+    val creationtime: Rep[Date] = column[Date]("creationTime")
+    /** Database column expirationTime SqlType(DATETIME) */
+    val expirationtime: Rep[Date] = column[Date]("expirationTime")
+    /** Database column isSignUp SqlType(TINYINT) */
+    val issignup: Rep[Boolean] = column[Boolean]("isSignUp")
+  }
+  /** Collection-like TableQuery object for table Token */
+  lazy val Token = new TableQuery(tag => new Token(tag))
+
+  /** Entity class storing rows of table User
+   *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
+   *  @param userid Database column userId SqlType(VARCHAR), Length(255,true)
+   *  @param providerid Database column providerId SqlType(VARCHAR), Length(255,true)
+   *  @param firstname Database column firstName SqlType(VARCHAR), Length(255,true)
+   *  @param lastname Database column lastName SqlType(VARCHAR), Length(255,true)
+   *  @param fullname Database column fullName SqlType(VARCHAR), Length(255,true)
+   *  @param email Database column email SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param avatarurl Database column avatarUrl SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param authmethod Database column authMethod SqlType(VARCHAR), Length(255,true)
+   *  @param token Database column token SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param secret Database column secret SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param accesstoken Database column accessToken SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param tokentype Database column tokenType SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param expiresin Database column expiresIn SqlType(INT), Default(None)
+   *  @param refreshtoken Database column refreshToken SqlType(VARCHAR), Length(255,true), Default(None) */
+  case class UserRow(id: Long, userid: String, providerid: String, firstname: String, lastname: String, fullname: String, email: Option[String] = None, avatarurl: Option[String] = None, authmethod: String, token: Option[String] = None, secret: Option[String] = None, accesstoken: Option[String] = None, tokentype: Option[String] = None, expiresin: Option[Int] = None, refreshtoken: Option[String] = None)
+  /** GetResult implicit for fetching UserRow objects using plain SQL queries */
+  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Int]]): GR[UserRow] = GR{
+    prs => import prs._
+    UserRow.tupled((<<[Long], <<[String], <<[String], <<[String], <<[String], <<[String], <<?[String], <<?[String], <<[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[Int], <<?[String]))
+  }
+  /** Table description of table user. Objects of this class serve as prototypes for rows in queries. */
+  class User(_tableTag: Tag) extends Table[UserRow](_tableTag, "user") {
+    def * = (id, userid, providerid, firstname, lastname, fullname, email, avatarurl, authmethod, token, secret, accesstoken, tokentype, expiresin, refreshtoken) <> (UserRow.tupled, UserRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(userid), Rep.Some(providerid), Rep.Some(firstname), Rep.Some(lastname), Rep.Some(fullname), email, avatarurl, Rep.Some(authmethod), token, secret, accesstoken, tokentype, expiresin, refreshtoken).shaped.<>({r=>import r._; _1.map(_=> UserRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7, _8, _9.get, _10, _11, _12, _13, _14, _15)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(BIGINT), AutoInc, PrimaryKey */
+    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column userId SqlType(VARCHAR), Length(255,true) */
+    val userid: Rep[String] = column[String]("userId", O.Length(255,varying=true))
+    /** Database column providerId SqlType(VARCHAR), Length(255,true) */
+    val providerid: Rep[String] = column[String]("providerId", O.Length(255,varying=true))
+    /** Database column firstName SqlType(VARCHAR), Length(255,true) */
+    val firstname: Rep[String] = column[String]("firstName", O.Length(255,varying=true))
+    /** Database column lastName SqlType(VARCHAR), Length(255,true) */
+    val lastname: Rep[String] = column[String]("lastName", O.Length(255,varying=true))
+    /** Database column fullName SqlType(VARCHAR), Length(255,true) */
+    val fullname: Rep[String] = column[String]("fullName", O.Length(255,varying=true))
+    /** Database column email SqlType(VARCHAR), Length(255,true), Default(None) */
+    val email: Rep[Option[String]] = column[Option[String]]("email", O.Length(255,varying=true), O.Default(None))
+    /** Database column avatarUrl SqlType(VARCHAR), Length(255,true), Default(None) */
+    val avatarurl: Rep[Option[String]] = column[Option[String]]("avatarUrl", O.Length(255,varying=true), O.Default(None))
+    /** Database column authMethod SqlType(VARCHAR), Length(255,true) */
+    val authmethod: Rep[String] = column[String]("authMethod", O.Length(255,varying=true))
+    /** Database column token SqlType(VARCHAR), Length(255,true), Default(None) */
+    val token: Rep[Option[String]] = column[Option[String]]("token", O.Length(255,varying=true), O.Default(None))
+    /** Database column secret SqlType(VARCHAR), Length(255,true), Default(None) */
+    val secret: Rep[Option[String]] = column[Option[String]]("secret", O.Length(255,varying=true), O.Default(None))
+    /** Database column accessToken SqlType(VARCHAR), Length(255,true), Default(None) */
+    val accesstoken: Rep[Option[String]] = column[Option[String]]("accessToken", O.Length(255,varying=true), O.Default(None))
+    /** Database column tokenType SqlType(VARCHAR), Length(255,true), Default(None) */
+    val tokentype: Rep[Option[String]] = column[Option[String]]("tokenType", O.Length(255,varying=true), O.Default(None))
+    /** Database column expiresIn SqlType(INT), Default(None) */
+    val expiresin: Rep[Option[Int]] = column[Option[Int]]("expiresIn", O.Default(None))
+    /** Database column refreshToken SqlType(VARCHAR), Length(255,true), Default(None) */
+    val refreshtoken: Rep[Option[String]] = column[Option[String]]("refreshToken", O.Length(255,varying=true), O.Default(None))
+  }
+  /** Collection-like TableQuery object for table User */
+  lazy val User = new TableQuery(tag => new User(tag))
 }
