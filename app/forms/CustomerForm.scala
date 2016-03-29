@@ -3,7 +3,7 @@ package forms
 import java.util.Date
 import play.api.data.Form
 import play.api.data.Forms._
-import models.Tables._
+import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
