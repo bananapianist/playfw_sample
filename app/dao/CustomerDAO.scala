@@ -22,7 +22,7 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Co
  
 
   def all(): Future[List[CustomerRow]] = {
-    dbConfig.db.run(customerquery.sortBy(c => c.id desc).result).map(_.toList)
+    dbConfig.db.run(customerquery.sortBy(c => c.id.desc).result).map(_.toList)
   }
 
   def findById(id: Long): Future[Option[CustomerRow]] = {
@@ -30,7 +30,7 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Co
   }
 
 def getNotificationList(): Future[List[CustomerRow]] =
-    dbConfig.db.run(customerquery.filter(n => (n.isDisabled === false) && (n.notificationDate < new Date)).sortBy(c => c.id desc).result).map(_.toList)
+    dbConfig.db.run(customerquery.filter(n => (n.isDisabled === false) && (n.notificationDate < new Date)).sortBy(c => c.id.desc).result).map(_.toList)
 
   def create(customer: CustomerRow): Future[Int] = {
     val c = customer.copy(
