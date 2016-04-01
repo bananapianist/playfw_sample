@@ -1,0 +1,12 @@
+import com.google.inject._
+import net.codingwell.scalaguice.ScalaModule
+import securesocial.core.{ BasicProfile, RuntimeEnvironment }
+import services._
+
+class SecurityModule extends AbstractModule with ScalaModule {
+  override def configure() {
+    val environment: MyRuntimeEnvironment = new MyRuntimeEnvironment
+    bind(new TypeLiteral[RuntimeEnvironment] {}).toInstance(environment)
+
+  }
+}

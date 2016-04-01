@@ -26,10 +26,20 @@ libraryDependencies ++= Seq(
 //  "com.github.tototoshi" %% "slick-joda-mapper" % "2.1.0",
   "joda-time" % "joda-time" % "2.3",
   "org.joda" % "joda-convert" % "1.6",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test,
+   "ws.securesocial" %% "securesocial" % "3.0-M4",
+   "net.codingwell" %% "scala-guice" % "4.0.0",
+   "com.typesafe.play" %% "play-mailer" % "3.0.1",
+//   "be.objectify" %% "deadbolt-scala" % "2.4.2",
+   "org.squeryl" %% "squeryl" % "0.9.5-7"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
+
+routesImport ++= Seq("scala.language.reflectiveCalls")
+
 
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
