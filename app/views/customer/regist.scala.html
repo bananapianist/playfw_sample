@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.Tables.CustomerRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages,request: RequestHeader)
 
 @import helper._
 @import play.api.i18n.Messages
@@ -14,7 +14,7 @@
 
     @helper.form(action=routes.CustomerController.create) {
     	@CSRF.formField
-		@views.html.customerform(form1)
+		@views.html.customer.form(form1)
 
         <button>登録</button>
     }

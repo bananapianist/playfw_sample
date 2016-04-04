@@ -4,12 +4,12 @@ import java.sql.Timestamp
 import java.util.Date
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
-object Tables extends {
+object TablesExtend extends {
   val profile = slick.driver.MySQLDriver
-} with Tables
+} with TablesExtend
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
-trait Tables {
+trait TablesExtend {
   val profile: slick.driver.JdbcProfile
   import profile.api._
   import slick.model.ForeignKeyAction
@@ -117,4 +117,5 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table PlayEvolutions */
   lazy val PlayEvolutions = new TableQuery(tag => new PlayEvolutions(tag))
+
 }
