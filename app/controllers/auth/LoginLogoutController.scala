@@ -34,7 +34,7 @@ import jp.t2v.lab.play2.auth.LoginLogout
 class LoginLogoutController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, LoginForm:LoginForm, val messagesApi: MessagesApi)
   extends Controller with LoginLogout with AuthConfigImpl with I18nSupport{
 
-  val UserAccountService = userAccountService
+  val UserAccountSv = userAccountService
   
   def index = addToken{
     Action { implicit request =>

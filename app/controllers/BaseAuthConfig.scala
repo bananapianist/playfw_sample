@@ -24,9 +24,9 @@ trait BaseAuthConfig  extends AuthConfig {
   val idTag: ClassTag[Id] = classTag[Id]
   val sessionTimeoutInSeconds: Int = 3600
   
-  val UserAccountService: UserAccountServiceLike
+  val UserAccountSv: UserAccountServiceLike
   
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[AccountRow]] = UserAccountService.findById(id)
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[AccountRow]] = UserAccountSv.findById(id)
   def authorizationFailed(request: RequestHeader)(implicit ctx: ExecutionContext) = throw new AssertionError("don't use")
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit ctx: ExecutionContext) = {
     Logger.info(s"authorizationFailed. userId: ${user.id}, userName: ${user.name}, authority: $authority")

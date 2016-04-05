@@ -1,51 +1,50 @@
 package controllers.admin
 
+import java.util.Date
 import scala.concurrent.Future
-
-import controllers.auth.AuthConfigAdminImpl
-import forms._
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthActionBuilders
+import services.dao._
 import models.TablesExtend._
+import common._
+import forms._
+import views._
 import play.api._
-import play.api.i18n.I18nSupport
-import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc._
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import skinny.util.JSONStringOps._
+import java.sql.Timestamp
+import org.joda.time.DateTime
+import org.joda.time.format._
+import play.api.i18n.{MessagesApi, I18nSupport}
+
 import play.filters.csrf._
 import play.filters.csrf.CSRF.Token
-import services.UserAccountServiceLike
-import services.dao._
-import skinny.util.JSONStringOps._
-import views._
-import common.auth.Role
-import common.auth.Role._
 
-class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
-  val UserAccountSv = userAccountService
+
+class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with I18nSupport  {
   /** This result directly redirect to the application home.*/
   val Home = Redirect(controllers.admin.routes.CustomerController.index())
-  import scala.concurrent.Future.{successful => future}
+
   def getToken = addToken(Action { implicit request =>
     val Token(name, value) = CSRF.getToken.get
     Ok(s"$name=$value")
   })
   
   def index = addToken{
-    OptionalAuthAction.async { 
+    Action.async { 
       customerDao.all().map(customers => Ok(views.html.customer.list("", customers)))
     }
   }
   def add = addToken{
-    AuthorizationAction(Administrator) {implicit request =>
+    Action {implicit request =>
       Ok(views.html.customer.regist("", CustomerForm.form))
     }
   }
   
   def create = checkToken{
-    AuthorizationAction(Administrator).async { implicit request =>
+    Action.async { implicit request =>
       CustomerForm.form.bindFromRequest.fold(
           formWithErrors => {
             Logger.debug(formWithErrors.toString())
@@ -63,7 +62,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
    
   def edit(customerId: Long) = addToken{
-    AuthorizationAction(Administrator).async {implicit request =>
+    Action.async {implicit request =>
       customerDao.findById(customerId).flatMap(option =>
         option match {
           case Some(customer) => Future(Ok(views.html.customer.edit("GET", CustomerForm.form.fill(customer))))
@@ -74,7 +73,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
 
   def update = checkToken {
-    AuthorizationAction(Administrator).async { implicit request =>
+    Action.async { implicit request =>
       CustomerForm.form.bindFromRequest.fold(
           formWithErrors => {
             Future(BadRequest(views.html.customer.edit("ERROR", formWithErrors)))
@@ -91,7 +90,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
   
     def delete(id: Long) = checkToken{
-      AuthorizationAction(Administrator).async {
+      Action.async {
         customerDao.delete(id).flatMap(cnt =>
           if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("削除しました", customers)))
           else customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
