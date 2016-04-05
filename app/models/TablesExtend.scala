@@ -23,9 +23,44 @@ trait TablesExtend {
   )
   
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Customer.schema ++ PlayEvolutions.schema
+  lazy val schema: profile.SchemaDescription = Account.schema ++ Customer.schema ++ PlayEvolutions.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
+
+  /** Entity class storing rows of table Account
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param email Database column email SqlType(VARCHAR), Length(255,true)
+   *  @param password Database column password SqlType(VARCHAR), Length(255,true)
+   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
+   *  @param role Database column role SqlType(VARCHAR), Length(255,true) */
+  case class AccountRow(id: Int, email: String, password: String, name: String, role: String)
+  /** GetResult implicit for fetching AccountRow objects using plain SQL queries */
+  implicit def GetResultAccountRow(implicit e0: GR[Int], e1: GR[String]): GR[AccountRow] = GR{
+    prs => import prs._
+    AccountRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<[String]))
+  }
+  /** Table description of table account. Objects of this class serve as prototypes for rows in queries. */
+  class Account(_tableTag: Tag) extends Table[AccountRow](_tableTag, "account") {
+    def * = (id, email, password, name, role) <> (AccountRow.tupled, AccountRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(email), Rep.Some(password), Rep.Some(name), Rep.Some(role)).shaped.<>({r=>import r._; _1.map(_=> AccountRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column email SqlType(VARCHAR), Length(255,true) */
+    val email: Rep[String] = column[String]("email", O.Length(255,varying=true))
+    /** Database column password SqlType(VARCHAR), Length(255,true) */
+    val password: Rep[String] = column[String]("password", O.Length(255,varying=true))
+    /** Database column name SqlType(VARCHAR), Length(255,true) */
+    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
+    /** Database column role SqlType(VARCHAR), Length(255,true) */
+    val role: Rep[String] = column[String]("role", O.Length(255,varying=true))
+
+    /** Uniqueness Index over (email) (database name email) */
+    val index1 = index("email", email, unique=true)
+  }
+  /** Collection-like TableQuery object for table Account */
+  lazy val Account = new TableQuery(tag => new Account(tag))
 
   /** Entity class storing rows of table Customer
    *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
@@ -117,5 +152,4 @@ trait TablesExtend {
   }
   /** Collection-like TableQuery object for table PlayEvolutions */
   lazy val PlayEvolutions = new TableQuery(tag => new PlayEvolutions(tag))
-
 }

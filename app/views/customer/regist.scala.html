@@ -12,7 +12,7 @@
     <h1>登録画面</h1>
     <p>@message</p>
 
-    @helper.form(action=routes.CustomerController.create) {
+    @helper.form(action=admin.routes.CustomerController.create) {
     	@CSRF.formField
 		@views.html.customer.form(form1)
 
