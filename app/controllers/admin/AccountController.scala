@@ -37,18 +37,18 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   })
   
   def index = addToken{
-    OptionalAuthAction.async { 
+    AuthorizationAction(Administrator).async { 
       accountDao.all().map(accounts => Ok(views.html.account.list("", accounts)))
     }
   }
   def add = addToken{
-    OptionalAuthAction {implicit request =>
+    AuthorizationAction(Administrator) {implicit request =>
       Ok(views.html.account.regist("", AccountForm.form))
     }
   }
   
   def create = checkToken{
-    OptionalAuthAction.async { implicit request =>
+    AuthorizationAction(Administrator).async { implicit request =>
       AccountForm.form.bindFromRequest.fold(
           formWithErrors => {
             Logger.debug(formWithErrors.toString())

@@ -35,18 +35,18 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   })
   
   def index = addToken{
-    OptionalAuthAction.async { 
+    AuthorizationAction(NormalUser).async { 
       customerDao.all().map(customers => Ok(views.html.customer.list("", customers)))
     }
   }
   def add = addToken{
-    AuthorizationAction(Administrator) {implicit request =>
+    AuthorizationAction(NormalUser) {implicit request =>
       Ok(views.html.customer.regist("", CustomerForm.form))
     }
   }
   
   def create = checkToken{
-    AuthorizationAction(Administrator).async { implicit request =>
+    AuthorizationAction(NormalUser).async { implicit request =>
       CustomerForm.form.bindFromRequest.fold(
           formWithErrors => {
             Logger.debug(formWithErrors.toString())
@@ -64,7 +64,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
    
   def edit(customerId: Long) = addToken{
-    AuthorizationAction(Administrator).async {implicit request =>
+    AuthorizationAction(NormalUser).async {implicit request =>
       customerDao.findById(customerId).flatMap(option =>
         option match {
           case Some(customer) => Future(Ok(views.html.customer.edit("GET", CustomerForm.form.fill(customer))))
@@ -75,7 +75,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
 
   def update = checkToken {
-    AuthorizationAction(Administrator).async { implicit request =>
+    AuthorizationAction(NormalUser).async { implicit request =>
       CustomerForm.form.bindFromRequest.fold(
           formWithErrors => {
             Future(BadRequest(views.html.customer.edit("ERROR", formWithErrors)))
@@ -91,19 +91,12 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
     }
   }
   
-    def delete(id: Long) = checkToken{
-      AuthorizationAction(Administrator).async {
-        customerDao.delete(id).flatMap(cnt =>
-          if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("削除しました", customers)))
-          else customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
-        )
-      }
+  def delete(id: Long) = checkToken{
+    AuthorizationAction(NormalUser).async {
+      customerDao.delete(id).flatMap(cnt =>
+        if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("削除しました", customers)))
+        else customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
+      )
     }
-    //  def register() = Action.async { implicit request =>
-//    val query = Customer.map(_.id)
-//    val resultingCustomers = dbConfig.db.run(query.result)
-//  }
-
-
-
+  }
 }

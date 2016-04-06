@@ -11,8 +11,8 @@ trait AuthConfigImpl extends BaseAuthConfig {
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.admin.routes.CustomerController.index))
 
-  def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.auth.routes.LoginLogoutController.login))
+  def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.auth.routes.LoginLogoutController.index))
 
-  def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.auth.routes.LoginLogoutController.login))
+  def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.auth.routes.LoginLogoutController.index))
 
 }

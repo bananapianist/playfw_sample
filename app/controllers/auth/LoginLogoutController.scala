@@ -62,10 +62,8 @@ class LoginLogoutController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
     }
   }
 
-  def logout() = checkToken {
-    Action.async { implicit request =>
+  def logout() = Action.async { implicit request =>
       gotoLogoutSucceeded
     }
-  }
 }
 

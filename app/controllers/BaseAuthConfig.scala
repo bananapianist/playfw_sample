@@ -30,7 +30,8 @@ trait BaseAuthConfig  extends AuthConfig {
   def authorizationFailed(request: RequestHeader)(implicit ctx: ExecutionContext) = throw new AssertionError("don't use")
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit ctx: ExecutionContext) = {
     Logger.info(s"authorizationFailed. userId: ${user.id}, userName: ${user.name}, authority: $authority")
-    Future.successful(Forbidden("no permission"))
+    //Future.successful(Forbidden("no permission"))
+    Future.successful(Status(401)(views.html.errors.error401forbidden("no permission")))
   }
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext) = Future.successful((Role.valueOf(user.role), authority) match {
     case (Administrator, _) => true
