@@ -61,3 +61,8 @@ help.password=パスワードを入力してください
 help.require={0}を入力してください
 help.datetime={0}の日時を入力してください。
 help.numeric={0}は数字を入力してください。
+
+#view
+view.formparts.administrator=管理者
+view.formparts.normaluser=一般ユーザー
+

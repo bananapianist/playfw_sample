@@ -1,4 +1,4 @@
-package dao
+package services.dao
 
 import java.util.Calendar
 import java.util.Date
@@ -16,7 +16,7 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
-class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Controller {
+class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val customerquery = TableQuery[Customer]
  

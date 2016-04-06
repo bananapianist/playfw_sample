@@ -26,6 +26,11 @@ libraryDependencies ++= Seq(
 //  "com.github.tototoshi" %% "slick-joda-mapper" % "2.1.0",
   "joda-time" % "joda-time" % "2.3",
   "org.joda" % "joda-convert" % "1.6",
+  "org.mindrot" % "jbcrypt" % "0.3m",
+  "jp.t2v" %% "play2-auth"        % "0.14.2",
+  "jp.t2v" %% "play2-auth-social" % "0.14.2",
+  "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",
+  play.sbt.Play.autoImport.cache,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
 
@@ -34,6 +39,7 @@ resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
+
 
 
 fork in run := true

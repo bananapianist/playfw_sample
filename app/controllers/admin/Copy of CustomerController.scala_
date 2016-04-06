@@ -1,9 +1,9 @@
-package controllers
+package controllers.admin
 
 import java.util.Date
 import scala.concurrent.Future
 import javax.inject.Inject
-import dao._
+import services.dao._
 import models.TablesExtend._
 import common._
 import forms._
@@ -25,7 +25,7 @@ import play.filters.csrf.CSRF.Token
 
 class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with I18nSupport  {
   /** This result directly redirect to the application home.*/
-  val Home = Redirect(routes.CustomerController.index())
+  val Home = Redirect(controllers.admin.routes.CustomerController.index())
 
   def getToken = addToken(Action { implicit request =>
     val Token(name, value) = CSRF.getToken.get
@@ -53,7 +53,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
           customer => {
             customerDao.create(customer).flatMap(cnt =>
                 //if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("登録しました", customers)))
-                if (cnt != 0) Future.successful(Redirect(routes.CustomerController.index))
+                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index))
                 else customerDao.all().map(notifications => BadRequest(views.html.customer.edit("エラー", CustomerForm.form.fill(customer))))
              )
           }

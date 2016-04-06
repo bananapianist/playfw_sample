@@ -69,7 +69,7 @@
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />
     <appender-ref ref="ASYNCSTDOUT" />
-    <appender-ref ref="STDOUT" />
+    <!--<appender-ref ref="STDOUT" />-->
     <appender-ref ref="FILE" />
     <appender-ref ref="FILESQL" />
   </root>

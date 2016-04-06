@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, form1: Form[models.TablesExtend.AccountRow])(implicit messages: Messages,request: RequestHeader)
 
 @import helper._
 @import play.api.i18n.Messages
@@ -12,13 +12,13 @@
     <h1>登録画面</h1>
     <p>@message</p>
 
-    @helper.form(action=admin.routes.CustomerController.create) {
+    @helper.form(action=admin.routes.AccountController.create) {
     	@CSRF.formField
-		@views.html.customer.form(form1)
+		@views.html.account.form(form1)
 
         <button>登録</button>
     }
 
-   <p><a href="/customer">[一覧]</a></p>
+   <p><a href="/account">[一覧]</a></p>
     <p><a href="/">[HOME]</a></p>
 }

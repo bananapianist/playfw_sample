@@ -6,7 +6,7 @@
     <h1>編集画面</h1>
     <p>@message</p>
 
-    @helper.form(action=routes.CustomerController.update) {
+    @helper.form(action=admin.routes.CustomerController.update) {
         <input type="hidden" name="id" value="@form1("id").value">
         @CSRF.formField
 		@views.html.customer.form(form1)
