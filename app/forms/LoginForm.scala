@@ -7,7 +7,7 @@ import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
-import common._
+import utilities._
 
 class LoginForm @Inject()(val messagesApi: MessagesApi)(implicit ValidationHelper: ValidationHelper) extends I18nSupport{
   val loginForm = Form(

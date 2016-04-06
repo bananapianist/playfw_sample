@@ -1,8 +1,8 @@
 package controllers
 
 import jp.t2v.lab.play2.auth.{AuthenticityToken, AsyncIdContainer, AuthConfig}
-import common.auth.Role
-import common.auth.Role._
+import utilities.auth.Role
+import utilities.auth.Role._
 import play.api.mvc.RequestHeader
 import play.api.mvc.Results._
 import scala.concurrent.{Future, ExecutionContext}

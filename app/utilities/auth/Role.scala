@@ -1,4 +1,4 @@
-package common.auth
+package utilities.auth
 
 
 sealed trait Role

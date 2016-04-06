@@ -1,4 +1,4 @@
-package common
+package utilities
 
 import java.sql.{Timestamp,Date,Time}
 import org.joda.time.{DateTime,LocalDate,LocalTime,DateTimeZone}

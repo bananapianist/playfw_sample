@@ -20,8 +20,8 @@ import services.UserAccountServiceLike
 import services.dao._
 import skinny.util.JSONStringOps._
 import views._
-import common.auth.Role
-import common.auth.Role._
+import utilities.auth.Role
+import utilities.auth.Role._
 
 class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   val UserAccountSv = userAccountService
