@@ -52,7 +52,7 @@ class LoginLogoutController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
           userAccountService.authenticate(account).flatMap {
             user => user match {
               case Some(user) =>
-                gotoLoginSucceeded(account.id)
+                gotoLoginSucceeded(user.id)
               case _ =>
                 Future.successful(Unauthorized(views.html.auth.login(LoginForm.loginForm.fill(account))))
             }
