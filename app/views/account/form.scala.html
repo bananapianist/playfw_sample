@@ -1,0 +1,31 @@
+@(form1: Form[models.TablesExtend.AccountRow])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+
+        @(helper.inputText (
+            field = form1("name"),
+            '_label -> "名前",
+            'placeholder -> "山田太郎",
+            '_help->""
+        ))
+        @(helper.inputText (
+            field = form1("email"),
+            '_label -> "メール",
+            'placeholder -> "eee@eee.kk",
+            '_help->""
+        ))
+        @(helper.inputPassword (
+            field = form1("password"),
+            '_label -> "パスワード",
+            'placeholder -> "",
+            '_help->""
+        ))
+         @(helper.select (
+            field = form1("role"),
+            options = Seq(utilities.auth.Role.AdministratorRole -> Messages("view.formparts.administrator"), utilities.auth.Role.NormalUserRole -> Messages("view.formparts.normaluser")),
+            args = 'size -> 1,
+            '_label -> "権限",
+            '_help->""
+        ))
+ 

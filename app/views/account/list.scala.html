@@ -1,0 +1,19 @@
+@(message: String, accounts: List[models.TablesExtend.AccountRow])
+
+@main("一覧画面") {
+
+    <h1>一覧画面</h1>
+    <p>@message</p>
+
+    <ul id="notifyItems">
+    @for(account <- accounts) {
+        <li>
+        <a href="/account/edit/@account.id">[編集]</a>
+        <a href="/account/remove/@account.id">[削除]</a>
+        @account.name @account.email
+        </li>
+    }
+    </ul>
+    <p><a href="/account/regist">[登録]</a></p>
+    <p><a href="/">[HOME]</a></p>
+}

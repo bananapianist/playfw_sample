@@ -30,9 +30,9 @@ class AccountForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
       email:  String,
       password:  String,
       role: String
-       ) = new AccountRow(id.getOrElse(0), name, email, password, role)
+       ) = new AccountRow(id.getOrElse(0), email, password, name, role)
   private def accountunapply(n: AccountRow) = Some(
-      (Option(n.id), n.name, n.email, n.password, n.role)
+      (Option(n.id), n.email, n.password, n.name, n.role)
       )
 
 }

@@ -1,6 +1,7 @@
 package controllers.admin
 
 import scala.concurrent.Future
+import scala.concurrent.Future.{successful => future}
 
 import controllers.auth.AuthConfigAdminImpl
 import forms._
@@ -27,7 +28,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   val UserAccountSv = userAccountService
   /** This result directly redirect to the application home.*/
   val Home = Redirect(controllers.admin.routes.CustomerController.index())
-  import scala.concurrent.Future.{successful => future}
+
   def getToken = addToken(Action { implicit request =>
     val Token(name, value) = CSRF.getToken.get
     Ok(s"$name=$value")

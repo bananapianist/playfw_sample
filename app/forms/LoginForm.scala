@@ -20,7 +20,7 @@ class LoginForm @Inject()(val messagesApi: MessagesApi)(implicit ValidationHelpe
   private def loginormapply(
       email: String, 
       password:  String
-       ) = new AccountRow(0, null, email, password, null)
+       ) = new AccountRow(0, email, password, null, null)
   private def loginormunapply(n: AccountRow) = Some(
       (n.email, n.password)
       )

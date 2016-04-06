@@ -15,6 +15,14 @@ POST    /auth/login                     @controllers.auth.LoginLogoutController.
 GET     /auth/logout                    @controllers.auth.LoginLogoutController.logout
 
 
+# Account page
+GET     /account                          @controllers.admin.AccountController.index
+GET     /account/regist                           @controllers.admin.AccountController.add
+GET     /account/edit/:id                           @controllers.admin.AccountController.edit(id : Int)
+POST    /account/create                     @controllers.admin.AccountController.create
+POST    /account/update                     @controllers.admin.AccountController.update
+GET    /account/remove/:id                     @controllers.admin.AccountController.delete(id : Int)
+
 # Customer page
 GET     /customer                          @controllers.admin.CustomerController.index
 #GET     /customer/view/:id                           @controllers.admin.CustomerController.get(id : Long)

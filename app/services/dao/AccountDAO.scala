@@ -56,6 +56,7 @@ class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
 
   def create(account: AccountRow): Future[Int] = {
     val c = account.copy(
+        password = this.encryptpassword(account.password)
     )
     dbConfig.db.run(accountquery += c)
   }
@@ -76,7 +77,7 @@ class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
           (
         account.name,
         account.email,
-        account.password,
+        this.encryptpassword(account.password),
         account.role
         )
       )
@@ -85,7 +86,9 @@ class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
   
   def delete(id: Int): Future[Int] = dbConfig.db.run(accountquery.filter(_.id === id).delete)
 
- 
+ def encryptpassword(password: String):String = {
+    return  BCrypt.hashpw(password, BCrypt.gensalt())
+  }
 
 }
 

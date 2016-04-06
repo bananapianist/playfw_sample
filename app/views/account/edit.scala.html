@@ -1,0 +1,18 @@
+@(message: String, form1: Form[models.TablesExtend.AccountRow])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+
+@main("編集画面") {
+
+    <h1>編集画面</h1>
+    <p>@message</p>
+
+    @helper.form(action=admin.routes.AccountController.update) {
+        <input type="hidden" name="id" value="@form1("id").value">
+        @CSRF.formField
+		@views.html.account.form(form1)
+        <button>更新</button>
+    }
+
+    <p><a href="/account">[一覧]</a></p>
+    <p><a href="/">[HOME]</a></p>
+}
