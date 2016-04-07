@@ -108,6 +108,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   
   def editadvance(customerId: Long) = addToken{
     AuthorizationAction(NormalUser).async {implicit request =>
+      cache.remove(FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"))
       customerDao.findById(customerId).flatMap(option =>
         option match {
           case Some(customer) => Future(Ok(views.html.customer.editadvance("GET", CustomerForm.form.fill(customer))))
@@ -118,8 +119,8 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
   def editadvanceback = addToken{
     AuthorizationAction(NormalUser).async {implicit request =>
-      val formdata: Option[CustomerRow] = cache.get[CustomerRow](FormConfig.FormCacheKey)
-      cache.get[CustomerRow](FormConfig.FormCacheKey) match {
+      val formdata: Option[CustomerRow] = cache.get[CustomerRow](FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"))
+      formdata match {
           case Some(customer) => Future(Ok(views.html.customer.editadvance("GET", CustomerForm.form.fill(customer))))
           case None => customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
       }
@@ -132,7 +133,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
             Future(BadRequest(views.html.customer.editadvance("ERROR", formWithErrors)))
           },
           customer => {
-            cache.set(FormConfig.FormCacheKey, customer, FormConfig.FormCacheTime)
+            cache.set(FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"), customer, FormConfig.FormCacheTime)
             Future((Ok(views.html.customer.editadvanceconfirm("", cache))))
           }
       )
@@ -140,8 +141,8 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
   def updateadvance = checkToken {
     AuthorizationAction(NormalUser).async { implicit request =>
-      val postdata: Option[CustomerRow] = cache.get[CustomerRow](FormConfig.FormCacheKey)
-      cache.remove(FormConfig.FormCacheKey)
+      val postdata: Option[CustomerRow] = cache.get[CustomerRow](FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"))
+      cache.remove(FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"))
       postdata match {
           case Some(customer) => 
              customerDao.update_mappinged(customer).flatMap(cnt =>

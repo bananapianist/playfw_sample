@@ -6,9 +6,9 @@
     <h1>確認画面</h1>
     <p>@message</p>
 
-    @defining(cache.get[models.TablesExtend.CustomerRow](utilities.config.FormConfig.FormCacheKey).getOrElse(null)) { customer =>
+    @defining(cache.get[models.TablesExtend.CustomerRow](utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid")).getOrElse(null)) { customer =>
     	
-    	@cache.set(utilities.config.FormConfig.FormCacheKey, customer, utilities.config.FormConfig.FormCacheTime)
+    	@cache.set(utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"), customer, utilities.config.FormConfig.FormCacheTime)
     	
         <ul>
         <li>名前: @customer.name</li>
