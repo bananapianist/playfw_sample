@@ -1,0 +1,18 @@
+@(message: String, form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+
+@main("編集画面") {
+
+    <h1>編集画面</h1>
+    <p>@message</p>
+
+    @helper.form(action=admin.routes.CustomerController.editadvanceconfirm) {
+        <input type="hidden" name="id" value="@form1("id").value">
+        @CSRF.formField
+		@views.html.customer.form(form1)
+        <button>確認</button>
+    }
+
+    <p><a href="/customer">[一覧]</a></p>
+    <p><a href="/">[HOME]</a></p>
+}

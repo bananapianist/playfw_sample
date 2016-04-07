@@ -35,5 +35,12 @@ POST    /customer/create                     @controllers.admin.CustomerControll
 POST    /customer/update                     @controllers.admin.CustomerController.update
 GET    /customer/remove/:id                     @controllers.admin.CustomerController.delete(id : Long)
 
+
+GET     /customer/editadvance/:id                           @controllers.admin.CustomerController.editadvance(id : Long)
+POST     /customer/editadvance                           @controllers.admin.CustomerController.editadvanceback
+POST     /customer/editadvanceconfirm                           @controllers.admin.CustomerController.editadvanceconfirm
+POST     /customer/updateadvance                           @controllers.admin.CustomerController.updateadvance
+GET     /customer/editadvancesuccess                           @controllers.admin.CustomerController.editadvancesuccess
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
