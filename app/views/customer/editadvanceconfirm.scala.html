@@ -1,0 +1,35 @@
+@(message: String, cache: play.api.cache.CacheApi)(implicit messages: Messages,request: RequestHeader)
+@import helper._
+
+@main("編集画面") {
+
+    <h1>確認画面</h1>
+    <p>@message</p>
+
+    @defining(cache.get[models.TablesExtend.CustomerRow](utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid")).getOrElse(null)) { customer =>
+    	
+    	@cache.set(utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"), customer, utilities.config.FormConfig.FormCacheTime)
+    	
+        <ul>
+        <li>名前: @customer.name</li>
+        <li>メール: @customer.email</li>
+        <li>電話番号: @customer.tel</li>
+        <li>住所: @customer.address</li>
+        <li>日時: @customer.actionDate</li>
+        <li>通知時間: @customer.notificationPeriod</li>
+        <li>説明: @customer.comment</li>
+         
+        <ul>
+	    @helper.form(action=admin.routes.CustomerController.updateadvance) {
+	        @CSRF.formField
+	        <button>更新</button>
+	    }
+	    @helper.form(action=admin.routes.CustomerController.editadvanceback) {
+	        @CSRF.formField
+	        <button>戻る</button>
+	    }
+    }
+
+    <p><a href="/customer">[一覧]</a></p>
+    <p><a href="/">[HOME]</a></p>
+}

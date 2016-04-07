@@ -9,6 +9,7 @@
     @for(customer <- customers) {
         <li>
         <a href="/customer/edit/@customer.id">[編集]</a>
+        <a href="/customer/editadvance/@customer.id">[確認あり編集]</a>
         <a href="/customer/remove/@customer.id">[削除]</a>
         @customer.name @customer.email
         </li>
