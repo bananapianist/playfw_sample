@@ -49,7 +49,7 @@
 			<fieldset class="form-group row  " id="name_field">
 				<label class="control-label form-control-label col-md-2">日時</label>
 				<div class="col-md-10">
-    				@customer.actionDate
+    				@utilities.ViewHelper.dateFormat(customer.actionDate, "%tY/%<tm/%<td %<tH:%<tM:%<tS")
 				</div>
 			</fieldset>
 

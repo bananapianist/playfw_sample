@@ -1,6 +1,7 @@
 package utilities
 
 import play.twirl.api.HtmlFormat
+import java.util.Date
 
 object ViewHelper {
   def nl2br(inputstr: Option[String], withescape:Boolean = true):String ={
@@ -13,5 +14,12 @@ object ViewHelper {
       case _ => ""
     }
     
+  }
+  
+  def dateFormat(inputdata: Option[Date], formatstr: String):String = {
+    inputdata match{
+      case Some(date) => formatstr format date
+      case _ => ""
+    }
   }
 }
