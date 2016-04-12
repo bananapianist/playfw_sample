@@ -1,0 +1,6 @@
+@(startField: Field, startArgs: (Symbol,Any)*)(globalArgs: (Symbol,Any)*)(implicit fc: b4.B4FieldConstructor, messages: Messages)
+@b4.multifield( startField)(globalArgs, startArgs) { implicit cfc =>
+	<div class="input-daterange input-group" @toHtmlArgs(bs.Args.inner(globalArgs).toMap)>
+		@b4.text(startField, startArgs:_*)
+	</div>
+}

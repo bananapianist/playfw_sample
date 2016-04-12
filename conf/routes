@@ -42,5 +42,7 @@ POST     /customer/editadvanceconfirm                           @controllers.adm
 POST     /customer/updateadvance                           @controllers.admin.CustomerController.updateadvance
 GET     /customer/editadvancesuccess                           @controllers.admin.CustomerController.editadvancesuccess
 
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+#GET     /webjars/*file                    controllers.WebJarAssets.at(file)

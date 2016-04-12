@@ -1,21 +1,89 @@
 @(message: String, customers: List[models.TablesExtend.CustomerRow])
 
 @main("一覧画面") {
-
-    <h1>一覧画面</h1>
+        <h1>一覧画面</h1>
     <p>@message</p>
+    <div class="text-center">
+           <ul class="pagination">
+                <li><a href="#">&laquo;</a></li>
+            </ul>
 
-    <ul id="notifyItems">
+            <ul class="pagination">
+                <li class="active'">
+                    <a href="#">1</a>
+                </li>
+                <li>
+                    <a href="#">2</a>
+                </li>
+                <li>
+                    <a href="#">3</a>
+                </li>
+                <li>
+                    <a href="#">4</a>
+                </li>
+                <li>
+                    <a href="#">5</a>
+                </li>
+            </ul>
+           <ul class="pagination">
+                <li><a href="#">&raquo;</a></li>
+            </ul>
+        </div>
+
+        <table class="table table-striped table-hover ">
+  
+            <tr class="info">
+                <th>名前</th>
+                <th>メール</th>
+                <th>住所</th>
+                <th>日時</th>
+                <th></th>
+                 <th></th>
+                 <th></th>
+            </tr>
     @for(customer <- customers) {
-        <li>
-        <a href="/customer/edit/@customer.id">[編集]</a>
-        <a href="/customer/editadvance/@customer.id">[確認あり編集]</a>
-        <a href="/customer/remove/@customer.id">[削除]</a>
-        @customer.name @customer.email
-        </li>
+	        <tr>
+	                <td>@customer.name</td>
+	                <td>@customer.email</td>
+	                <td>@customer.address</td>
+	                <td>@customer.actionDate</td>
+	        <td><a href="/customer/edit/@customer.id">[編集]</a></td>
+	        <td><a href="/customer/editadvance/@customer.id">[確認あり編集]</a></td>
+	        <td><a href="/customer/remove/@customer.id">[削除]</a></td>
+          </tr>
     }
-    </ul>
-    <p><a href="/customer/regist">[登録]</a></p>
+ 		</table>
+        <div class="text-center">
+            <ul class="pagination">
+                <li><a href="#">&laquo;</a></li>
+            </ul>
+
+            <ul class="pagination">
+                <li class="active'">
+                    <a href="#">1</a>
+                </li>
+                <li>
+                    <a href="#">2</a>
+                </li>
+                <li>
+                    <a href="#">3</a>
+                </li>
+                <li>
+                    <a href="#">4</a>
+                </li>
+                <li>
+                    <a href="#">5</a>
+                </li>
+            </ul>
+
+            <ul class="pagination">
+                <li><a href="#">&raquo;</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+     <p><a href="/customer/regist">[登録]</a></p>
     <p><a href="/account">[アカウント管理]</a></p>
     <p><a href="/auth/logout">[ログアウト]</a></p>
 }

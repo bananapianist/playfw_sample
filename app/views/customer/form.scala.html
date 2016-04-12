@@ -1,47 +1,16 @@
-@(form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages)
+@(formcustomer: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages)
 
 @import helper._
 @import play.api.i18n.Messages
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-10") }
 
-        @(helper.inputText (
-            field = form1("name"),
-            '_label -> "名前",
-            'placeholder -> "山田太郎",
-            '_help->""
-        ))
-        @(helper.inputText (
-            field = form1("email"),
-            '_label -> "メール",
-            'placeholder -> "eee@eee.kk",
-            '_help->""
-        ))
-        @(helper.inputText (
-            field = form1("tel"),
-            '_label -> "電話番号",
-            'placeholder -> "02-2333-3333",
-//            '_help -> Messages("help.require", "電話番号")
-            '_help->""
-        ))
-        @(helper.inputText (
-            field = form1("address"),
-            '_label -> "住所",
-            'placeholder -> "東京都千代田区",
-//            '_help -> Messages("help.require", "住所")
-            '_help->""
-        ))
-        @helper.input(form1("actionDate"), '_label -> "日時",'_help->"") { (id, name, value, args) =>
-            <input type="datetime-local" name="@name" id="@id" value="@value" @toHtmlArgs(args)>
-        }
-        @(helper.select (
-            field = form1("notificationPeriod"),
-            options = Seq("1" -> "1分前", "10" -> "10分前", "15" -> "15分前", "20" -> "20分前", "25" -> "25分前"
-                        , "30" -> "30分前", "45" -> "45分前", "60" -> "1時間前"),
-            args = 'size -> 1,
-            '_label -> "通知時間",
-            '_help->""
-        ))
-        @(helper.textarea (
-            field = form1("comment"),
-            '_label -> "説明",
-            '_help->""
-        ))
+
+	@b4.text( formcustomer("name"), '_label -> "名前", 'placeholder -> "山田太郎" )
+	@b4.email( formcustomer("email"), '_label -> "メール", 'placeholder -> "example@mail.com" )
+	@b4.text( formcustomer("tel"), '_label -> "電話番号", 'placeholder -> "02-2333-3333" )
+	@b4.text( formcustomer("address"), '_label -> "住所", 'placeholder -> "東京都千代田区" )
+	@b4.datepicker( formcustomer("actionDate") )('_label -> "日時", '_help -> "" )
+	@b4.select( formcustomer("notificationPeriod"), options = Seq("1" -> "1分前", "10" -> "10分前", "15" -> "15分前", "20" -> "20分前", "25" -> "25分前", "30" -> "30分前", "45" -> "45分前", "60" -> "1時間前"), '_label -> "通知時間" )
+ 	@b4.textarea( formcustomer("comment"), '_label -> "説明", 'rows -> 3)
+  
+  
