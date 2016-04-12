@@ -25,6 +25,10 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
     dbConfig.db.run(customerquery.sortBy(c => c.id.desc).result).map(_.toList)
   }
 
+  def paginglist(page: Int, offset: Int): Future[List[CustomerRow]] = {
+    dbConfig.db.run(customerquery.drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result).map(_.toList)
+  }
+
   def findById(id: Long): Future[Option[CustomerRow]] = {
     dbConfig.db.run(customerquery.filter(_.id === id).result.headOption)
   }

@@ -27,7 +27,9 @@ POST    /account/update                     @controllers.admin.AccountController
 GET    /account/remove/:id                     @controllers.admin.AccountController.delete(id : Int)
 
 # Customer page
-GET     /customer                          @controllers.admin.CustomerController.index
+#GET     /customer                          @controllers.admin.CustomerController.index
+GET     /customer                          @controllers.admin.CustomerController.index(page: Integer = 1)
+GET     /customer/:page                          @controllers.admin.CustomerController.index(page: Integer)
 #GET     /customer/view/:id                           @controllers.admin.CustomerController.get(id : Long)
 GET     /customer/regist                           @controllers.admin.CustomerController.add
 GET     /customer/edit/:id                           @controllers.admin.CustomerController.edit(id : Long)

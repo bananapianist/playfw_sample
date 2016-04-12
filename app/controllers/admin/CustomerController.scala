@@ -30,18 +30,20 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   
   val UserAccountSv = userAccountService
   
+  val pageOffset = 3
+  
   
   /** This result directly redirect to the application home.*/
-  val Home = Redirect(controllers.admin.routes.CustomerController.index())
+  val Home = Redirect(controllers.admin.routes.CustomerController.index(1))
 
   def getToken = addToken(Action { implicit request =>
     val Token(name, value) = CSRF.getToken.get
     Ok(s"$name=$value")
   })
   
-  def index = addToken{
+  def index(page: Int = 1) = addToken{
     AuthorizationAction(NormalUser).async { 
-      customerDao.all().map(customers => Ok(views.html.customer.list("", customers)))
+      customerDao.paginglist(page, pageOffset).map(customers => Ok(views.html.customer.list("", customers)))
     }
   }
   def add = addToken{
@@ -60,7 +62,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
           customer => {
             customerDao.create(customer).flatMap(cnt =>
                 //if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("登録しました", customers)))
-                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index))
+                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index(1)))
                 else customerDao.all().map(notifications => BadRequest(views.html.customer.edit("エラー", CustomerForm.form.fill(customer))))
              )
           }
