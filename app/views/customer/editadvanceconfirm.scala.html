@@ -16,73 +16,68 @@
     @defining(cache.get[models.TablesExtend.CustomerRow](utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid")).getOrElse(null)) { customer =>
     	
     	@cache.set(utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"), customer, utilities.config.FormConfig.FormCacheTime)
-    	<div class="row">
-	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">名前</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.name
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">メール</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.email
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">電話番号</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.tel
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">住所</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.address
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">日時</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.actionDate
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">通知時間</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@customer.notificationPeriod
-	  			</div>
-			</div>
- 	    	<div class="panel panel-success">
-	  			<div class="panel-heading">
-	    			<h3 class="panel-title">説明</h3>
-	  			</div>
-	  			<div class="panel-body">
-	    			@Html(utilities.ViewHelper.nl2br(customer.comment))
-	  			</div>
-			</div>
-	        <div class="row">
+   		<div class="row">
+   	    	<form class="form-horizontal" >
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">名前</label>
+				<div class="col-md-10">
+    				@customer.name
+				</div>
+			</fieldset>
+			
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">メール</label>
+				<div class="col-md-10">
+    				@customer.email
+				</div>
+			</fieldset>
+			
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">電話番号</label>
+				<div class="col-md-10">
+    				@customer.tel
+				</div>
+			</fieldset>
+
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">住所</label>
+				<div class="col-md-10">
+    				@customer.address
+				</div>
+			</fieldset>
+
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">日時</label>
+				<div class="col-md-10">
+    				@customer.actionDate
+				</div>
+			</fieldset>
+
+ 			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">通知時間</label>
+				<div class="col-md-10">
+    				@customer.notificationPeriod
+				</div>
+			</fieldset>
+ 
+ 			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">説明</label>
+				<div class="col-md-10">
+    				@Html(utilities.ViewHelper.nl2br(customer.comment))
+				</div>
+			</fieldset>
+			</form>
+ 		</div>
+	    <div class="row">
 	       	@b4.form(action=admin.routes.CustomerController.editadvanceback) {
 		        @CSRF.formField
-		        <div class="col-xs-2 bg-info">@b4.submit('class -> "btn btn-info"){戻る}</div>
+		        <div class="col-xs-5">@b4.submit('class -> "btn btn-info pull-right"){戻る}</div>
 		    }
 	        @b4.form(action=admin.routes.CustomerController.updateadvance) {
 		        @CSRF.formField
-		        <div class="col-xs-2 bg-info">@b4.submit('class -> "btn btn-primary"){更新}</div>
+		        <div class="col-xs-5">@b4.submit('class -> "btn btn-primary pull-left"){更新}</div>
 		    }
-	 	    </div>
+	 	</div>
     }
 
     <p><a href="/customer"c lass="btn btn-link">一覧</a></p>
