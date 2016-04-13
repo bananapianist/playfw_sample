@@ -16,7 +16,7 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
-class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
+class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDAO[CustomerRow, Long]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val customerquery = TableQuery[Customer]
  
@@ -42,7 +42,7 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
     dbConfig.db.run(customerquery.filter(_.id === id).result.headOption)
   }
 
-def getNotificationList(): Future[List[CustomerRow]] =
+  def getNotificationList(): Future[List[CustomerRow]] =
     dbConfig.db.run(customerquery.filter(n => (n.isDisabled === false) && (n.notificationDate < new Date)).sortBy(c => c.id.desc).result).map(_.toList)
 
   def create(customer: CustomerRow): Future[Int] = {

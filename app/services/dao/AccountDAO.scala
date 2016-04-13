@@ -19,7 +19,7 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
-class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
+class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[AccountRow, Int]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val accountquery = TableQuery[Account]
  
@@ -44,6 +44,10 @@ class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
 
   def all(): Future[List[AccountRow]] = {
     dbConfig.db.run(accountquery.sortBy(c => c.id.desc).result).map(_.toList)
+  }
+
+  def count(): Future[Int] = {
+    dbConfig.db.run(accountquery.sortBy(c => c.id.desc).length.result)
   }
 
   def findByEmail(email: String): Future[Option[AccountRow]] = {
