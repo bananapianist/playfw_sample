@@ -25,6 +25,7 @@ import views._
 import utilities.auth.Role
 import utilities.auth.Role._
 import utilities.config._
+import utilities._
 
 class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   
@@ -41,10 +42,21 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
     Ok(s"$name=$value")
   })
   
-  def index(page: Int = 1) = addToken{
-    AuthorizationAction(NormalUser).async { 
-      customerDao.paginglist(page, pageOffset).map(customers => Ok(views.html.customer.list("", customers)))
+  def pageNation(currentPageNum: Int, pageName: String) = addToken{
+    AuthorizationAction(NormalUser) { implicit request =>
+      pageName match {
+        case "index" => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
+        case _       => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
+      }
     }
+  }
+  
+  def index(page: Int = 1) = addToken{
+    AuthorizationAction(NormalUser).async {implicit request =>
+      customerDao.paginglist(page, pageOffset).map{case (pagecount,customers) =>
+        Ok(views.html.customer.list("", customers.toList, new PageNation(page, pagecount, pageOffset)))
+      }
+   }
   }
   def add = addToken{
     AuthorizationAction(NormalUser) {implicit request =>
@@ -75,7 +87,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
       customerDao.findById(customerId).flatMap(option =>
         option match {
           case Some(customer) => Future(Ok(views.html.customer.edit("GET", CustomerForm.form.fill(customer))))
-          case None => customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
+          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
         }
       )
     }
@@ -89,8 +101,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
           },
           customer => {
             customerDao.update_mappinged(customer).flatMap(cnt =>
-              if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("更新しました", customers)))
-              //if (cnt != 0) Future.successful(Redirect(routes.CustomerController.index))
+              if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index(1)))
               else customerDao.all().map(notifications => BadRequest(views.html.customer.edit("エラー", CustomerForm.form.fill(customer))))
             )
           }
@@ -102,8 +113,8 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
     AuthorizationAction(NormalUser).async {
       cache.remove(FormConfig.FormCacheKey)
       customerDao.delete(id).flatMap(cnt =>
-        if (cnt != 0) customerDao.all().map(customers => Ok(views.html.customer.list("削除しました", customers)))
-        else customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
+        if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index(1)))
+        else Future.successful(Status(500)(views.html.errors.error500internalerror("error")))
       )
     }
   }
@@ -114,7 +125,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
       customerDao.findById(customerId).flatMap(option =>
         option match {
           case Some(customer) => Future(Ok(views.html.customer.editadvance("GET", CustomerForm.form.fill(customer))))
-          case None => customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
+          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
         }
       )
     }
@@ -124,7 +135,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
       val formdata: Option[CustomerRow] = cache.get[CustomerRow](FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"))
       formdata match {
           case Some(customer) => Future(Ok(views.html.customer.editadvance("GET", CustomerForm.form.fill(customer))))
-          case None => customerDao.all().map(customers => BadRequest(views.html.customer.list("エラー", customers)))
+          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
       }
     }
   }

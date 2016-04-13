@@ -25,8 +25,17 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
     dbConfig.db.run(customerquery.sortBy(c => c.id.desc).result).map(_.toList)
   }
 
-  def paginglist(page: Int, offset: Int): Future[List[CustomerRow]] = {
-    dbConfig.db.run(customerquery.drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result).map(_.toList)
+  def count(): Future[Int] = {
+    dbConfig.db.run(customerquery.sortBy(c => c.id.desc).length.result)
+  }
+
+  def paginglist(page: Int, offset: Int): Future[(Int, Seq[CustomerRow])] = {
+    val pagelistsql = (for {
+        count <- customerquery.sortBy(c => c.id.desc).length.result
+        customers <- customerquery.drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result
+    }yield (count, customers)
+    )
+    dbConfig.db.run(pagelistsql.transactionally)
   }
 
   def findById(id: Long): Future[Option[CustomerRow]] = {
