@@ -23,7 +23,7 @@
 	                <td>@customer.name</td>
 	                <td>@customer.email</td>
 	                <td>@customer.address</td>
-	                <td>@customer.actionDate</td>
+	                <td>@utilities.ViewHelper.dateFormat(customer.actionDate, "%tY/%<tm/%<td %<tH:%<tM:%<tS")</td>
 	        <td><a href="/customer/edit/@customer.id">[編集]</a></td>
 	        <td><a href="/customer/editadvance/@customer.id">[確認あり編集]</a></td>
 	        <td><a href="/customer/remove/@customer.id">[削除]</a></td>

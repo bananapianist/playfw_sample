@@ -2,6 +2,7 @@
 
 @import helper._
 @import play.api.i18n.Messages
+@import utilities._
 @implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-10") }
 
 
@@ -10,7 +11,8 @@
 	@b4.text( formcustomer("tel"), '_label -> "電話番号", 'placeholder -> "02-2333-3333" )
 	@b4.text( formcustomer("address"), '_label -> "住所", 'placeholder -> "東京都千代田区" )
 	@b4.datetimeLocal( formcustomer("actionDate"),'_label -> "日時")
-	@b4.select( formcustomer("notificationPeriod"), options = Seq("1" -> "1分前", "10" -> "10分前", "15" -> "15分前", "20" -> "20分前", "25" -> "25分前", "30" -> "30分前", "45" -> "45分前", "60" -> "1時間前"), '_label -> "通知時間" )
+	@*@b4.select( formcustomer("notificationPeriod"), options = Seq("1" -> "1分前", "10" -> "10分前", "15" -> "15分前", "20" -> "20分前", "25" -> "25分前", "30" -> "30分前", "45" -> "45分前", "60" -> "1時間前"), '_label -> "通知時間") *@
+	@b4.select( formcustomer("notificationPeriod"), options = utilities.ViewHelper.makeOptionSeq(Seq("1","10","15","20","25","30","45","60"), "view.customer.notificationPeriod", messages), '_label -> "通知時間" )
  	@b4.textarea( formcustomer("comment"), '_label -> "説明", 'rows -> 3)
   
   

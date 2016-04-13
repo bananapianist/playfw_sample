@@ -56,7 +56,7 @@
  			<fieldset class="form-group row  " id="name_field">
 				<label class="control-label form-control-label col-md-2">通知時間</label>
 				<div class="col-md-10">
-    				@customer.notificationPeriod
+					@utilities.ViewHelper.getOptionView(customer.notificationPeriod.getOrElse("-1").toString,utilities.ViewHelper.makeOptionMap(Seq("1","10","15","20","25","30","45","60"), "view.customer.notificationPeriod", messages))
 				</div>
 			</fieldset>
  
