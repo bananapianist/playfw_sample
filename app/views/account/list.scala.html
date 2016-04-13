@@ -1,20 +1,30 @@
-@(message: String, accounts: List[models.TablesExtend.AccountRow])
+@(message: String, accounts: List[models.TablesExtend.AccountRow])(implicit messages: Messages)
 
 @main("一覧画面") {
 
-    <h1>一覧画面</h1>
-    <p>@message</p>
-
-    <ul id="notifyItems">
+         <table class="table table-striped table-hover ">
+  
+            <tr class="info">
+                <th>名前</th>
+                <th>メール</th>
+                <th>権限</th>
+                 <th></th>
+                 <th></th>
+            </tr>
     @for(account <- accounts) {
-        <li>
-        <a href="/account/edit/@account.id">[編集]</a>
-        <a href="/account/remove/@account.id">[削除]</a>
-        @account.name @account.email
-        </li>
+	        <tr>
+	                <td>@account.name</td>
+	                <td>@account.email</td>
+	                <td>@utilities.ViewHelper.getOptionView(account.role,utilities.ViewHelper.makeOptionMap(Seq(utilities.auth.Role.AdministratorRole,utilities.auth.Role.NormalUserRole), "view.account.role", messages))</td>
+	        <td><a href="@admin.routes.AccountController.edit(account.id)">[編集]</a></td>
+	        <td><a href="@admin.routes.AccountController.delete(account.id)">[削除]</a></td>
+          </tr>
     }
-    </ul>
-    <p><a href="/account/regist">[登録]</a></p>
-    <p><a href="/customer">[顧客管理]</a></p>
-    <p><a href="/auth/logout">[ログアウト]</a></p>
-}
+ 		</table>
+        <div class="text-center">
+    <div class="text-center">
+         <p><a href="@admin.routes.AccountController.add" class="btn btn-success">新規登録</a></p>
+        </div>
+    </div>
+ 
+ }
