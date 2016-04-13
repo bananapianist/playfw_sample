@@ -42,14 +42,6 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
     Ok(s"$name=$value")
   })
   
-  def pageNation(currentPageNum: Int, pageName: String) = addToken{
-    AuthorizationAction(NormalUser) { implicit request =>
-      pageName match {
-        case "index" => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
-        case _       => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
-      }
-    }
-  }
   
   def index(page: Int = 1) = addToken{
     AuthorizationAction(NormalUser).async {implicit request =>
@@ -160,14 +152,22 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
           case Some(customer) => 
              customerDao.update_mappinged(customer).flatMap(cnt =>
               if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.editadvancesuccess))
-              //if (cnt != 0) Future.successful(Redirect(routes.CustomerController.index))
               else customerDao.all().map(notifications => BadRequest(views.html.customer.editadvance("エラー", CustomerForm.form.fill(customer))))
             )
           case None => Future.successful(Status(500)(views.html.errors.error500internalerror("no formdata")))
       }
     }
   }
-  def editadvancesuccess = AuthorizationAction(NormalUser).async {
+  def editadvancesuccess = {
+    AuthorizationAction(NormalUser).async {implicit request =>
         Future(Ok(views.html.customer.editadvancesuccess("更新しました")))
+    }
+  }
+  
+  def pagenation(currentPageNum: Int, pageName: String) = AuthorizationAction(NormalUser) { implicit request =>
+    pageName match {
+      case "index" => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
+      case _       => Redirect(controllers.admin.routes.CustomerController.index(currentPageNum))
+    }
   }
 }

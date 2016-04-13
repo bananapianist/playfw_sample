@@ -29,9 +29,9 @@ GET    /account/remove/:id                     @controllers.admin.AccountControl
 # Customer page
 #GET     /customer                          @controllers.admin.CustomerController.index
 GET     /customer                          @controllers.admin.CustomerController.index(page: Integer = 1)
-GET     /customer/index                          @controllers.admin.CustomerController.index(page: Integer = 1)
+##GET     /customer/index                          @controllers.admin.CustomerController.index(page: Integer = 1)
 GET     /customer/:page                          @controllers.admin.CustomerController.index(page: Integer)
-GET     /customer/pageNation/:page                    @controllers.admin.CustomerController.pageNation(page: Int, pagename: String)
+GET     /customer/pagenation/:page                    @controllers.admin.CustomerController.pagenation(page: Int, pagename: String)
 #GET     /customer/view/:id                           @controllers.admin.CustomerController.get(id : Long)
 GET     /customer/regist                           @controllers.admin.CustomerController.add
 GET     /customer/edit/:id                           @controllers.admin.CustomerController.edit(id : Long)
@@ -44,7 +44,8 @@ GET     /customer/editadvance/:id                           @controllers.admin.C
 POST     /customer/editadvance                           @controllers.admin.CustomerController.editadvanceback
 POST     /customer/editadvanceconfirm                           @controllers.admin.CustomerController.editadvanceconfirm
 POST     /customer/updateadvance                           @controllers.admin.CustomerController.updateadvance
-GET     /customer/editadvancesuccess                           @controllers.admin.CustomerController.editadvancesuccess
+GET     /customer/editadvancesuccess/                           @controllers.admin.CustomerController.editadvancesuccess
+
 
 
 # Map static resources from the /public folder to the /assets URL path
