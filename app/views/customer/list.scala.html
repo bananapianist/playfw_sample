@@ -1,4 +1,6 @@
 @(message: String, customers: List[models.TablesExtend.CustomerRow], page: utilities.PageNation[_])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
 @main("一覧画面") {
         <h1>一覧画面</h1>
@@ -24,9 +26,13 @@
 	                <td>@customer.email</td>
 	                <td>@customer.address</td>
 	                <td>@utilities.ViewHelper.dateFormat(customer.actionDate, "%tY/%<tm/%<td %<tH:%<tM:%<tS")</td>
-	        <td><a href="@admin.routes.CustomerController.edit(customer.id)">[編集]</a></td>
-	        <td><a href="@admin.routes.CustomerController.editadvance(customer.id)">[確認あり編集]</a></td>
-	        <td><a href="@admin.routes.CustomerController.delete(customer.id)">[削除]</a></td>
+	        <td><a href="@admin.routes.CustomerController.edit(customer.id)" class="btn btn-link">編集</a></td>
+	        <td><a href="@admin.routes.CustomerController.editadvance(customer.id)" class="btn btn-link">確認あり編集</a></td>
+	        <td>@b4.form(action=admin.routes.CustomerController.delete(customer.id)) {
+	        	@CSRF.formField 
+	        	@b4.submit('class -> "btn btn-link"){削除}}
+	        	</td>
+
           </tr>
     }
  		</table>

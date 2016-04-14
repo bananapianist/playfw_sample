@@ -1,4 +1,6 @@
-@(message: String, accounts: List[models.TablesExtend.AccountRow])(implicit messages: Messages)
+@(message: String, accounts: List[models.TablesExtend.AccountRow])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
 @main("一覧画面") {
 
@@ -16,8 +18,11 @@
 	                <td>@account.name</td>
 	                <td>@account.email</td>
 	                <td>@utilities.ViewHelper.getOptionView(account.role,utilities.ViewHelper.makeOptionMap(Seq(utilities.auth.Role.AdministratorRole,utilities.auth.Role.NormalUserRole), "view.account.role", messages))</td>
-	        <td><a href="@admin.routes.AccountController.edit(account.id)">[編集]</a></td>
-	        <td><a href="@admin.routes.AccountController.delete(account.id)">[削除]</a></td>
+	        <td><a href="@admin.routes.AccountController.edit(account.id)" class="btn btn-link">編集</a></td>
+	        <td>@b4.form(action=admin.routes.AccountController.delete(account.id)) {
+	        	@CSRF.formField 
+	        	@b4.submit('class -> "btn btn-link"){削除}}
+	        	</td>
           </tr>
     }
  		</table>

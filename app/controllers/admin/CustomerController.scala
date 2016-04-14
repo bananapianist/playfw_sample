@@ -102,7 +102,7 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   }
   
   def delete(id: Long) = checkToken{
-    AuthorizationAction(NormalUser).async {
+    AuthorizationAction(NormalUser).async { implicit request =>
       cache.remove(FormConfig.FormCacheKey)
       customerDao.delete(id).flatMap(cnt =>
         if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.CustomerController.index(1)))

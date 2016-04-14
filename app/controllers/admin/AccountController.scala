@@ -37,7 +37,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   })
   
   def index = addToken{
-    AuthorizationAction(Administrator).async { 
+    AuthorizationAction(Administrator).async { implicit request =>
       accountDao.all().map(accounts => Ok(views.html.account.list("", accounts)))
     }
   }
@@ -94,7 +94,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   }
   
     def delete(id: Int) = checkToken{
-      AuthorizationAction(Administrator).async {
+      AuthorizationAction(Administrator).async {implicit request =>
         accountDao.delete(id).flatMap(cnt =>
           if (cnt != 0) accountDao.all().map(accounts => Ok(views.html.account.list("削除しました", accounts)))
           else accountDao.all().map(accounts => BadRequest(views.html.account.list("エラー", accounts)))
