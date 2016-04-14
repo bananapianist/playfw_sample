@@ -9,7 +9,7 @@ import scala.concurrent.{Future, ExecutionContext}
 
 trait AuthConfigAdminImpl extends BaseAuthConfig {
 
-  def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.admin.routes.CustomerController.index))
+  def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.admin.routes.CustomerController.index(1)))
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) = Future.successful(Redirect(controllers.auth.routes.LoginLogoutController.index))
 

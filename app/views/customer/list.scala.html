@@ -1,21 +1,47 @@
-@(message: String, customers: List[models.TablesExtend.CustomerRow])
+@(message: String, customers: List[models.TablesExtend.CustomerRow], page: utilities.PageNation[_])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
 @main("一覧画面") {
-
-    <h1>一覧画面</h1>
+        <h1>一覧画面</h1>
     <p>@message</p>
+    <div class="text-center">
+    @views.html.customer.pageNation(page, "")
+    </div>
 
-    <ul id="notifyItems">
+        <table class="table table-striped table-hover ">
+  
+            <tr class="info">
+                <th>名前</th>
+                <th>メール</th>
+                <th>住所</th>
+                <th>日時</th>
+                <th></th>
+                 <th></th>
+                 <th></th>
+            </tr>
     @for(customer <- customers) {
-        <li>
-        <a href="/customer/edit/@customer.id">[編集]</a>
-        <a href="/customer/editadvance/@customer.id">[確認あり編集]</a>
-        <a href="/customer/remove/@customer.id">[削除]</a>
-        @customer.name @customer.email
-        </li>
+	        <tr>
+	                <td>@customer.name</td>
+	                <td>@customer.email</td>
+	                <td>@customer.address</td>
+	                <td>@utilities.ViewHelper.dateFormat(customer.actionDate, "%tY/%<tm/%<td %<tH:%<tM:%<tS")</td>
+	        <td><a href="@admin.routes.CustomerController.edit(customer.id)" class="btn btn-link">編集</a></td>
+	        <td><a href="@admin.routes.CustomerController.editadvance(customer.id)" class="btn btn-link">確認あり編集</a></td>
+	        <td>@b4.form(action=admin.routes.CustomerController.delete(customer.id)) {
+	        	@CSRF.formField 
+	        	@b4.submit('class -> "btn btn-link"){削除}}
+	        	</td>
+
+          </tr>
     }
-    </ul>
-    <p><a href="/customer/regist">[登録]</a></p>
-    <p><a href="/account">[アカウント管理]</a></p>
-    <p><a href="/auth/logout">[ログアウト]</a></p>
+ 		</table>
+        <div class="text-center">
+    <div class="text-center">
+    @views.html.customer.pageNation(page, "")
+         <p><a href="@admin.routes.CustomerController.add" class="btn btn-success">新規登録</a></p>
+        </div>
+    </div>
+
+
 }

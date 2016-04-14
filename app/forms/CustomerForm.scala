@@ -18,7 +18,7 @@ class CustomerForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
       "email" -> email,
       "tel" -> text.verifying(pattern("""[0-9a-zA-Z-]+""".r,error=Messages("error.alphabet"))),
       "address" -> text.verifying(Messages("error.required", "住所"), {!_.isEmpty}),
-      "comment" -> text.verifying(Messages("error.maxLength", 10),{_.length <= 10 }),
+      "comment" -> text.verifying(Messages("error.maxLength", 255),{_.length <= 255 }),
       "actionDate" -> date("yyyy-MM-dd'T'HH:mm"),
 //      "notificationPeriod" -> optional(number(min = 0, max = 100)),
       "notificationPeriod" -> number,

@@ -1,24 +1,27 @@
 @(message: String, form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages,request: RequestHeader)
 
 @import helper._
-@import play.api.i18n.Messages
-
-@form1.errors.foreach { error =>
-  <div>@error.message</div>
-}
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
 @main("登録画面") {
 
-    <h1>登録画面</h1>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">登録画面</h3>
+                    </div>
     <p>@message</p>
 
-    @helper.form(action=admin.routes.CustomerController.create) {
+    @b4.form(action=admin.routes.CustomerController.create) {
     	@CSRF.formField
 		@views.html.customer.form(form1)
+		@b4.submit('class -> "btn btn-primary"){登録}
 
-        <button>登録</button>
     }
 
-   <p><a href="/customer">[一覧]</a></p>
-    <p><a href="/">[HOME]</a></p>
+    </div>
+    <p><a href="@admin.routes.CustomerController.index(1)" class="btn btn-link">一覧</a></p>
+    </div>
+    </div>
 }

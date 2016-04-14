@@ -31,10 +31,16 @@ libraryDependencies ++= Seq(
   "jp.t2v" %% "play2-auth-social" % "0.14.2",
   "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",
   play.sbt.Play.autoImport.cache,
+//  "org.webjars" %% "webjars-play" % "2.4.0-1",
+//  "org.webjars" % "bootstrap" % "3.2.0",
+  "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B4",
+//  "org.webjars" % "font-awesome" % "4.5.0",
+//  "org.webjars" % "bootstrap-datepicker" % "1.4.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
 
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.

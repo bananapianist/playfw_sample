@@ -37,19 +37,19 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   })
   
   def index = addToken{
-    AuthorizationAction(Administrator).async { 
+    AuthorizationAction(Administrator).async { implicit request =>
       accountDao.all().map(accounts => Ok(views.html.account.list("", accounts)))
     }
   }
   def add = addToken{
     AuthorizationAction(Administrator) {implicit request =>
-      Ok(views.html.account.regist("", AccountForm.form))
+      Ok(views.html.account.regist("", AccountForm.formnew))
     }
   }
   
   def create = checkToken{
     AuthorizationAction(Administrator).async { implicit request =>
-      AccountForm.form.bindFromRequest.fold(
+      AccountForm.formnew.bindFromRequest.fold(
           formWithErrors => {
             Logger.debug(formWithErrors.toString())
             Future(BadRequest(views.html.account.regist("エラー", formWithErrors)))
@@ -58,7 +58,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
             accountDao.create(account).flatMap(cnt =>
                 //if (cnt != 0) accountDao.all().map(accounts => Ok(views.html.account.list("登録しました", accounts)))
                 if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.AccountController.index))
-                else accountDao.all().map(notifications => BadRequest(views.html.account.edit("エラー", AccountForm.form.fill(account))))
+                else accountDao.all().map(notifications => BadRequest(views.html.account.edit("エラー", AccountForm.formnew.fill(account))))
              )
           }
       )
@@ -69,7 +69,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
     AuthorizationAction(Administrator).async {implicit request =>
       accountDao.findById(accountId).flatMap(option =>
         option match {
-          case Some(account) => Future(Ok(views.html.account.edit("GET", AccountForm.form.fill(account))))
+          case Some(account) => Future(Ok(views.html.account.edit("GET", AccountForm.formedit.fill(account))))
           case None => accountDao.all().map(accounts => BadRequest(views.html.account.list("エラー", accounts)))
         }
       )
@@ -78,7 +78,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
 
   def update = checkToken {
     AuthorizationAction(Administrator).async { implicit request =>
-      AccountForm.form.bindFromRequest.fold(
+      AccountForm.formedit.bindFromRequest.fold(
           formWithErrors => {
             Future(BadRequest(views.html.account.edit("ERROR", formWithErrors)))
           },
@@ -86,7 +86,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
             accountDao.update_mappinged(account).flatMap(cnt =>
               if (cnt != 0) accountDao.all().map(accounts => Ok(views.html.account.list("更新しました", accounts)))
               //if (cnt != 0) Future.successful(Redirect(routes.AccountController.index))
-              else accountDao.all().map(notifications => BadRequest(views.html.account.edit("エラー", AccountForm.form.fill(account))))
+              else accountDao.all().map(notifications => BadRequest(views.html.account.edit("エラー", AccountForm.formedit.fill(account))))
             )
           }
       )
@@ -94,7 +94,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   }
   
     def delete(id: Int) = checkToken{
-      AuthorizationAction(Administrator).async {
+      AuthorizationAction(Administrator).async {implicit request =>
         accountDao.delete(id).flatMap(cnt =>
           if (cnt != 0) accountDao.all().map(accounts => Ok(views.html.account.list("削除しました", accounts)))
           else accountDao.all().map(accounts => BadRequest(views.html.account.list("エラー", accounts)))

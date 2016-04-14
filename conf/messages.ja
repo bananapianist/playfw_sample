@@ -63,6 +63,14 @@ help.datetime={0}の日時を入力してください。
 help.numeric={0}は数字を入力してください。
 
 #view
-view.formparts.administrator=管理者
-view.formparts.normaluser=一般ユーザー
+view.account.role.Administrator=管理者
+view.account.role.NormalUser=一般ユーザー
 
+view.customer.notificationPeriod.1=1分前
+view.customer.notificationPeriod.10=10分前
+view.customer.notificationPeriod.15=15分前
+view.customer.notificationPeriod.20=20分前
+view.customer.notificationPeriod.25=25分前
+view.customer.notificationPeriod.30=30分前
+view.customer.notificationPeriod.45=45分前
+view.customer.notificationPeriod.60=1時間前

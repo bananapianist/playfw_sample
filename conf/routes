@@ -24,16 +24,16 @@ GET     /account/regist                           @controllers.admin.AccountCont
 GET     /account/edit/:id                           @controllers.admin.AccountController.edit(id : Int)
 POST    /account/create                     @controllers.admin.AccountController.create
 POST    /account/update                     @controllers.admin.AccountController.update
-GET    /account/remove/:id                     @controllers.admin.AccountController.delete(id : Int)
+POST    /account/remove/:id                     @controllers.admin.AccountController.delete(id : Int)
 
 # Customer page
-GET     /customer                          @controllers.admin.CustomerController.index
+GET     /customer                          @controllers.admin.CustomerController.index(page: Integer = 1)
 #GET     /customer/view/:id                           @controllers.admin.CustomerController.get(id : Long)
 GET     /customer/regist                           @controllers.admin.CustomerController.add
 GET     /customer/edit/:id                           @controllers.admin.CustomerController.edit(id : Long)
 POST    /customer/create                     @controllers.admin.CustomerController.create
 POST    /customer/update                     @controllers.admin.CustomerController.update
-GET    /customer/remove/:id                     @controllers.admin.CustomerController.delete(id : Long)
+POST    /customer/remove/:id                     @controllers.admin.CustomerController.delete(id : Long)
 
 
 GET     /customer/editadvance/:id                           @controllers.admin.CustomerController.editadvance(id : Long)
@@ -42,5 +42,11 @@ POST     /customer/editadvanceconfirm                           @controllers.adm
 POST     /customer/updateadvance                           @controllers.admin.CustomerController.updateadvance
 GET     /customer/editadvancesuccess                           @controllers.admin.CustomerController.editadvancesuccess
 
+# ※ページ設定はグループ最後に記述しないとおかしな動きになる
+GET     /customer/:page                          @controllers.admin.CustomerController.index(page: Integer)
+GET     /customer/pagenation/:page                    @controllers.admin.CustomerController.pagenation(page: Int, pagename: String)
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+#GET     /webjars/*file                    controllers.WebJarAssets.at(file)

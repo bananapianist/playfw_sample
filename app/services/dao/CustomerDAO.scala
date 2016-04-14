@@ -16,7 +16,7 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
-class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
+class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDAO[CustomerRow, Long]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val customerquery = TableQuery[Customer]
  
@@ -25,11 +25,24 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) {
     dbConfig.db.run(customerquery.sortBy(c => c.id.desc).result).map(_.toList)
   }
 
+  def count(): Future[Int] = {
+    dbConfig.db.run(customerquery.sortBy(c => c.id.desc).length.result)
+  }
+
+  def paginglist(page: Int, offset: Int): Future[(Int, Seq[CustomerRow])] = {
+    val pagelistsql = (for {
+        count <- customerquery.sortBy(c => c.id.desc).length.result
+        customers <- customerquery.drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result
+    }yield (count, customers)
+    )
+    dbConfig.db.run(pagelistsql.transactionally)
+  }
+
   def findById(id: Long): Future[Option[CustomerRow]] = {
     dbConfig.db.run(customerquery.filter(_.id === id).result.headOption)
   }
 
-def getNotificationList(): Future[List[CustomerRow]] =
+  def getNotificationList(): Future[List[CustomerRow]] =
     dbConfig.db.run(customerquery.filter(n => (n.isDisabled === false) && (n.notificationDate < new Date)).sortBy(c => c.id.desc).result).map(_.toList)
 
   def create(customer: CustomerRow): Future[Int] = {
