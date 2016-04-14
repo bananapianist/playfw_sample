@@ -70,22 +70,42 @@ class AccountDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends Ba
   }
 
   def update_mappinged(account: AccountRow): Future[Int] = {
-     dbConfig.db.run(accountquery.filter(_.id === account.id).map(
-         c => (
-            c.name,
-            c.email,
-            c.password,
-            c.role
+    Option(account.password) match{
+      case Some(s) if ((s == null) || (s.trim.isEmpty)) =>
+         dbConfig.db.run(accountquery.filter(_.id === account.id).map(
+           c => (
+              c.name,
+              c.email,
+              c.role
+              )
+          ).update(
+            (
+            account.name,
+            account.email,
+            account.role
             )
-      ).update(
-          (
-        account.name,
-        account.email,
-        this.encryptpassword(account.password),
-        account.role
+          )
         )
-      )
-    )
+        
+      case _ =>
+         dbConfig.db.run(accountquery.filter(_.id === account.id).map(
+           c => (
+              c.name,
+              c.email,
+              c.password,
+              c.role
+              )
+          ).update(
+            (
+            account.name,
+            account.email,
+            this.encryptpassword(account.password),
+            account.role
+            )
+          )
+        )
+        
+    }
   }
   
   def delete(id: Int): Future[Int] = dbConfig.db.run(accountquery.filter(_.id === id).delete)
