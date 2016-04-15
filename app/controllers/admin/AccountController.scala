@@ -23,10 +23,30 @@ import skinny.util.JSONStringOps._
 import views._
 import utilities.auth.Role
 import utilities.auth.Role._
+import java.util.Calendar
 
+import akka.actor._
+import actors.MailsendActor
+import play.api.libs.mailer.MailerClient
+import scala.concurrent.duration._
 
-class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, accountDao: AccountDAO, AccountForm:AccountForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
+class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, accountDao: AccountDAO, AccountForm:AccountForm, val messagesApi: MessagesApi, system: ActorSystem, mc: MailerClient) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   val UserAccountSv = userAccountService
+
+  Logger.info("start Actaor")
+  val mailsendActor = system.actorOf(MailsendActor.props(mc), "mailclient-actor")
+  var cl = Calendar.getInstance
+  cl.set(Calendar.SECOND, 0)
+  cl.set(Calendar.MILLISECOND, 0)
+  cl.add(Calendar.MINUTE, 1)
+  system.scheduler.schedule(
+      (cl.getTimeInMillis - System.currentTimeMillis).milliseconds,
+      5.seconds,
+      mailsendActor,
+      "mailsend"
+  )
+  Logger.info("Actor has started")
+  
   /** This result directly redirect to the application home.*/
   val Home = Redirect(controllers.admin.routes.AccountController.index())
 

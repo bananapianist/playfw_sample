@@ -12,30 +12,31 @@ val playSlickVersion = "1.1.1"
  
 libraryDependencies ++= Seq(
 //  jdbc,
-  cache,
+  cache,													//****cache modile***
   ws,
   evolutions,
   filters,
-  "org.skinny-framework" %% "skinny-json" % "1.3.20",
-  "com.typesafe.play" %% "play-slick" % playSlickVersion,
-  "com.typesafe.play" %% "play-slick-evolutions" % playSlickVersion,
+   "org.skinny-framework" %% "skinny-json" % "1.3.20",	
+  "com.typesafe.play" %% "play-slick" % playSlickVersion,	//****DB FRM***
+  "com.typesafe.play" %% "play-slick-evolutions" % playSlickVersion,		//****DB FRM***
 //  "mysql" % "mysql-connector-java" % "5.1.36",
-  "org.mariadb.jdbc" % "mariadb-java-client" % "1.3.3",
-  "com.typesafe.slick" %% "slick" % slickVersion,
-  "com.typesafe.slick" %% "slick-codegen" % slickVersion,
+  "org.mariadb.jdbc" % "mariadb-java-client" % "1.3.3",		//****DB Driver***
+  "com.typesafe.slick" %% "slick" % slickVersion,			//****DB FRM***
+  "com.typesafe.slick" %% "slick-codegen" % slickVersion,	//****DB FRM***
 //  "com.github.tototoshi" %% "slick-joda-mapper" % "2.1.0",
-  "joda-time" % "joda-time" % "2.3",
+  "joda-time" % "joda-time" % "2.3",						//****Datetime ***
   "org.joda" % "joda-convert" % "1.6",
   "org.mindrot" % "jbcrypt" % "0.3m",
-  "jp.t2v" %% "play2-auth"        % "0.14.2",
-  "jp.t2v" %% "play2-auth-social" % "0.14.2",
-  "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",
+  "jp.t2v" %% "play2-auth"        % "0.14.2",				//****Auth module***
+  "jp.t2v" %% "play2-auth-social" % "0.14.2",				//****Auth module***
+  "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",		//****Auth module***
   play.sbt.Play.autoImport.cache,
 //  "org.webjars" %% "webjars-play" % "2.4.0-1",
 //  "org.webjars" % "bootstrap" % "3.2.0",
-  "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B4",
+  "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B4",		//****Bootstrap***
 //  "org.webjars" % "font-awesome" % "4.5.0",
 //  "org.webjars" % "bootstrap-datepicker" % "1.4.0",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0-M1",			//****mail plugin***
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
 
