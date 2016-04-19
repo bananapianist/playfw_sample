@@ -1,0 +1,168 @@
+package controllers.admin
+
+import scala.concurrent.Future
+import scala.concurrent.Future.{successful => future}
+
+import controllers.auth.AuthConfigAdminImpl
+import forms._
+import javax.inject.Inject
+import jp.t2v.lab.play2.auth.AuthActionBuilders
+import models.TablesExtend._
+import play.api._
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.mvc._
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.api.cache._
+import play.filters.csrf._
+import play.filters.csrf.CSRF.Token
+import services.UserAccountServiceLike
+import services.dao._
+import skinny.util.JSONStringOps._
+import views._
+import utilities.auth.Role
+import utilities.auth.Role._
+import utilities.config._
+import utilities._
+
+class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, contractDao: ContractDAO, ContractForm:ContractForm, BillForm:BillForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
+  
+  val UserAccountSv = userAccountService
+  
+  val pageOffset = 10
+  
+  
+  /** This result directly redirect to the application home.*/
+  val Home = Redirect(controllers.admin.routes.ContractController.index(1))
+
+  
+  def index(page: Int = 1) = addToken{
+    AuthorizationAction(NormalUser).async {implicit request =>
+      contractDao.paginglist(page, pageOffset).map{case (pagecount,contracts) =>
+        Ok(views.html.contract.list("", contracts.toList, new PageNation(page, pagecount, pageOffset)))
+      }
+   }
+  }
+//  def add = addToken{
+//    AuthorizationAction(NormalUser) {implicit request =>
+//      Ok(views.html.contract.regist("", ContractForm.form))
+//    }
+//  }
+//  
+//  def create = checkToken{
+//    AuthorizationAction(NormalUser).async { implicit request =>
+//      ContractForm.form.bindFromRequest.fold(
+//          formWithErrors => {
+//            Logger.debug(formWithErrors.toString())
+//            Future(BadRequest(views.html.contract.regist("エラー", formWithErrors)))
+//          },
+//          contract => {
+//            contractDao.create(contract).flatMap(cnt =>
+//                //if (cnt != 0) contractDao.all().map(contracts => Ok(views.html.contract.list("登録しました", contracts)))
+//                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
+//                else contractDao.all().map(notifications => BadRequest(views.html.contract.edit("エラー", ContractForm.form.fill(contract))))
+//             )
+//          }
+//      )
+//    }
+//  }
+//   
+//  def edit(contractId: Long) = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      contractDao.findById(contractId).flatMap(option =>
+//        option match {
+//          case Some(contract) => Future(Ok(views.html.contract.edit("GET", ContractForm.form.fill(contract))))
+//          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
+//        }
+//      )
+//    }
+//  }
+//
+//  def update = checkToken {
+//    AuthorizationAction(NormalUser).async { implicit request =>
+//      ContractForm.form.bindFromRequest.fold(
+//          formWithErrors => {
+//            Future(BadRequest(views.html.contract.edit("ERROR", formWithErrors)))
+//          },
+//          contract => {
+//            contractDao.update_mappinged(contract).flatMap(cnt =>
+//              if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
+//              else contractDao.all().map(notifications => BadRequest(views.html.contract.edit("エラー", ContractForm.form.fill(contract))))
+//            )
+//          }
+//      )
+//    }
+//  }
+//  
+//  def delete(id: Long) = checkToken{
+//    AuthorizationAction(NormalUser).async { implicit request =>
+//      cache.remove(FormConfig.FormCacheKey)
+//      contractDao.delete(id).flatMap(cnt =>
+//        if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
+//        else Future.successful(Status(500)(views.html.errors.error500internalerror("error")))
+//      )
+//    }
+//  }
+//  
+//  def editadvance(contractId: Long) = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      cache.remove(FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"))
+//      contractDao.findById(contractId).flatMap(option =>
+//        option match {
+//          case Some(contract) => Future(Ok(views.html.contract.editadvance("GET", ContractForm.form.fill(contract))))
+//          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
+//        }
+//      )
+//    }
+//  }
+//  def editadvanceback = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      val formdata: Option[ContractRow] = cache.get[ContractRow](FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"))
+//      formdata match {
+//          case Some(contract) => Future(Ok(views.html.contract.editadvance("GET", ContractForm.form.fill(contract))))
+//          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
+//      }
+//    }
+//  }
+//  def editadvanceconfirm = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      ContractForm.form.bindFromRequest.fold(
+//          formWithErrors => {
+//            Future(BadRequest(views.html.contract.editadvance("ERROR", formWithErrors)))
+//          },
+//          contract => {
+//            cache.set(FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"), contract, FormConfig.FormCacheTime)
+//            Future((Ok(views.html.contract.editadvanceconfirm("", cache))))
+//          }
+//      )
+//    }
+//  }
+//  def updateadvance = checkToken {
+//    AuthorizationAction(NormalUser).async { implicit request =>
+//      val postdata: Option[ContractRow] = cache.get[ContractRow](FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"))
+//      cache.remove(FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"))
+//      postdata match {
+//          case Some(contract) => 
+//             contractDao.update_mappinged(contract).flatMap(cnt =>
+//              if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.editadvancesuccess))
+//              else contractDao.all().map(notifications => BadRequest(views.html.contract.editadvance("エラー", ContractForm.form.fill(contract))))
+//            )
+//          case None => Future.successful(Status(500)(views.html.errors.error500internalerror("no formdata")))
+//      }
+//    }
+//  }
+//  def editadvancesuccess = {
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//        Future(Ok(views.html.contract.editadvancesuccess("更新しました")))
+//    }
+//  }
+  
+  def pagenation(currentPageNum: Int, pageName: String) = AuthorizationAction(NormalUser) { implicit request =>
+    pageName match {
+      case "index" => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
+      case _       => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
+    }
+  }
+}

@@ -31,8 +31,8 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
 
   def paginglist(page: Int, offset: Int): Future[(Int, Seq[CustomerRow])] = {
     val pagelistsql = (for {
-        count <- customerquery.sortBy(c => c.id.desc).length.result
-        customers <- customerquery.drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result
+        count <- customerquery.filter(n => (n.isDisabled === false)).sortBy(c => c.id.desc).length.result
+        customers <- customerquery.filter(n => (n.isDisabled === false)).drop((page-1) * offset).take(offset).sortBy(c => c.id.desc).result
     }yield (count, customers)
     )
     dbConfig.db.run(pagelistsql.transactionally)
