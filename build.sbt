@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % playSlickVersion,	//****DB FRM***
   "com.typesafe.play" %% "play-slick-evolutions" % playSlickVersion,		//****DB FRM***
 //  "mysql" % "mysql-connector-java" % "5.1.36",
-  "org.mariadb.jdbc" % "mariadb-java-client" % "1.3.3",		//****DB Driver***
+  "org.mariadb.jdbc" % "mariadb-java-client" % "1.4.2",		//****DB Driver***
   "com.typesafe.slick" %% "slick" % slickVersion,			//****DB FRM***
   "com.typesafe.slick" %% "slick-codegen" % slickVersion,	//****DB FRM***
 //  "com.github.tototoshi" %% "slick-joda-mapper" % "2.1.0",
