@@ -1,4 +1,4 @@
-@(message: String, cache: play.api.cache.CacheApi)(implicit messages: Messages,request: RequestHeader)
+@(message: String, cache: play.api.cache.CacheApi, customerList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
 @import helper._
 @import utilities._
 @implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-10") }
@@ -13,74 +13,86 @@
 
     <p>@message</p>
 
-    @defining(cache.get[models.TablesExtend.CustomerRow](utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid")).getOrElse(null)) { customer =>
+    @defining(cache.get[models.TablesExtend.ContractBillRow](utilities.config.FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid")).getOrElse(null)) { contractbill =>
     	
-    	@cache.set(utilities.config.FormConfig.FormCacheKey + "-customeredit-" + request.session.get("uuid"), customer, utilities.config.FormConfig.FormCacheTime)
+    	@cache.set(utilities.config.FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"), contractbill, utilities.config.FormConfig.FormCacheTime)
    		<div class="row">
    	    	<form class="form-horizontal" >
-			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">名前</label>
+  			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">顧客</label>
 				<div class="col-md-10">
-    				@customer.name
+					@utilities.ViewHelper.getOptionView(contractbill.customerId.toString,customerList.toMap)
 				</div>
 			</fieldset>
-			
-			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">メール</label>
-				<div class="col-md-10">
-    				@customer.email
-				</div>
-			</fieldset>
-			
-			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">電話番号</label>
-				<div class="col-md-10">
-    				@customer.tel
-				</div>
-			</fieldset>
-
-			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">住所</label>
-				<div class="col-md-10">
-    				@customer.address
-				</div>
-			</fieldset>
-
-			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">日時</label>
-				<div class="col-md-10">
-    				@utilities.ViewHelper.dateFormat(customer.actionDate, "%tY/%<tm/%<td %<tH:%<tM:%<tS")
-				</div>
-			</fieldset>
-
  			<fieldset class="form-group row  " id="name_field">
-				<label class="control-label form-control-label col-md-2">通知時間</label>
+				<label class="control-label form-control-label col-md-2">ステータス</label>
 				<div class="col-md-10">
-					@utilities.ViewHelper.getOptionView(customer.notificationPeriod.getOrElse("-1").toString,utilities.ViewHelper.makeOptionMap(Seq("1","10","15","20","25","30","45","60"), "view.customer.notificationPeriod", messages))
+					@utilities.ViewHelper.getOptionView(contractbill.status.getOrElse("-1").toString,utilities.ViewHelper.makeOptionMap(utilities.contract.Status.statusSeq, "view.contract.status", messages))
 				</div>
 			</fieldset>
- 
- 			<fieldset class="form-group row  " id="name_field">
+			<fieldset class="form-group row  " id="name_field">
 				<label class="control-label form-control-label col-md-2">説明</label>
 				<div class="col-md-10">
-    				@Html(utilities.ViewHelper.nl2br(customer.comment))
+    				@Html(utilities.ViewHelper.nl2br(contractbill.comment))
 				</div>
 			</fieldset>
-			</form>
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">契約日</label>
+				<div class="col-md-10">
+    				@utilities.ViewHelper.dateFormat(contractbill.contractDate, "%tY/%<tm/%<td")
+				</div>
+			</fieldset>
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">解約日</label>
+				<div class="col-md-10">
+    				@utilities.ViewHelper.dateFormat(contractbill.cancelDate, "%tY/%<tm/%<td")
+				</div>
+			</fieldset>
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">請求先名前</label>
+				<div class="col-md-10">
+    				@contractbill.bill.billName
+				</div>
+			</fieldset>
+			
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">請求先名前メール</label>
+				<div class="col-md-10">
+    				@contractbill.bill.billEmail
+				</div>
+			</fieldset>
+			
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">請求先名前電話番号</label>
+				<div class="col-md-10">
+    				@contractbill.bill.billTel
+				</div>
+			</fieldset>
+
+			<fieldset class="form-group row  " id="name_field">
+				<label class="control-label form-control-label col-md-2">請求先名前住所</label>
+				<div class="col-md-10">
+    				@contractbill.bill.billAddress
+				</div>
+			</fieldset>
+
+
+ 
+ 			</form>
  		</div>
 	    <div class="row">
-	       	@b4.form(action=admin.routes.CustomerController.editadvanceback) {
+	       	@b4.form(action=admin.routes.ContractController.editback) {
 		        @CSRF.formField
 		        <div class="col-xs-5">@b4.submit('class -> "btn btn-info pull-right"){戻る}</div>
 		    }
-	        @b4.form(action=admin.routes.CustomerController.updateadvance) {
+	        @b4.form(action=admin.routes.ContractController.update) {
 		        @CSRF.formField
 		        <div class="col-xs-5">@b4.submit('class -> "btn btn-primary pull-left"){更新}</div>
 		    }
 	 	</div>
     }
 
-    <p><a href="@admin.routes.CustomerController.index(1)" class="btn btn-link">一覧</a></p>
+    <p><a href="@admin.routes.ContractController.index(1)" class="btn btn-link">一覧</a></p>
     </div>
   </div>
 </div>

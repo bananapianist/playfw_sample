@@ -54,4 +54,7 @@ class ContractBillForm @Inject()(val messagesApi: MessagesApi) extends I18nSuppo
       (Option(n.id), n.billName.getOrElse(null), n.billEmail.getOrElse(null), n.billTel.getOrElse(null), n.billAddress.getOrElse(null))
       )
 
+  def createContactBillRow(contract: ContractRow, bill: BillRow): ContractBillRow = {
+      new ContractBillRow(contract.id, contract.customerId, contract.status, contract.comment, contract.contractDate, contract.cancelDate, contract.isDisabled, contract.createdDate, contract.updatedDate, bill)
+  }
 }

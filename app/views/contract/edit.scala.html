@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.TablesExtend.CustomerRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, formcontractbill: Form[models.TablesExtend.ContractBillRow], customerList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
 @import helper._
 @implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
@@ -13,10 +13,10 @@
                     </div>
     <p>@message</p>
 
-    @b4.form(action=admin.routes.CustomerController.editadvanceconfirm) {
-        <input type="hidden" name="id" value="@form1("id").value">
+    @b4.form(action=admin.routes.ContractController.editconfirm) {
+        <input type="hidden" name="id" value="@formcontractbill("id").value">
         @CSRF.formField
-		@views.html.customer.form(form1)
+		@views.html.contract.form(formcontractbill,customerList)
 		@b4.submit('class -> "btn btn-primary"){確認}
     }
 

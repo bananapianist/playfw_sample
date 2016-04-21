@@ -59,13 +59,13 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     dbConfig.db.run(contractquery += c)
   }
 
-    def createWithBill(contractbill: ContractBillRow): Future[Long] = {
+    def create(contractbill: ContractBillRow, bill: BillRow): Future[Long] = {
       val contractnew = new ContractRow(0, contractbill.customerId, contractbill.status, contractbill.comment, contractbill.contractDate, contractbill.cancelDate, Option(false), Option(new Date),new Date)
       val action =
       (for {
        newId <- (contractquery returning contractquery.map(_.id) += contractnew)
        // その結果を使って更新
-       _ <- billquery += contractbill.bill.copy(
+       _ <- billquery += bill.copy(
            contractId = newId,
            createdDate = Option(new Date),
             updatedDate = new Date
@@ -104,10 +104,10 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     )
   }
  
-  def update_mappinged(contract: ContractRow, bill: BillRow): Future[Int] = {
+  def update_mappinged(contractbill: ContractBillRow, bill: BillRow): Future[Int] = {
     val action =
     (for {
-       updatedContractId <- contractquery.filter(_.id === contract.id).map(
+       updatedContractId <- contractquery.filter(_.id === contractbill.id).map(
            c => (
               c.customerId,
               c.status,
@@ -119,17 +119,17 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
               )
         ).update(
             (
-          contract.customerId,
-          contract.status,
-          contract.comment,
-          contract.contractDate,
-          contract.cancelDate,
-          contract.isDisabled,
+          contractbill.customerId,
+          contractbill.status,
+          contractbill.comment,
+          contractbill.contractDate,
+          contractbill.cancelDate,
+          contractbill.isDisabled,
           new Date
           )
         )
        // その結果を使って更新
-       _ <- billquery.filter(b => (b.id === bill.id) && (b.contractId === contract.id)).map(
+       _ <- billquery.filter(b => (b.id === bill.id) && (b.contractId === contractbill.id)).map(
          c => (
             c.billName,
             c.billEmail,

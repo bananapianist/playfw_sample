@@ -50,6 +50,12 @@ GET     /customer/pagenation/:page                    @controllers.admin.Custome
 GET     /contract                          @controllers.admin.ContractController.index(page: Integer = 1)
 GET     /contract/regist                           @controllers.admin.ContractController.add
 POST    /contract/create                     @controllers.admin.ContractController.create
+GET     /contract/edit/:id                           @controllers.admin.ContractController.edit(id : Long)
+POST     /contract/edit                          @controllers.admin.ContractController.editback
+POST     /contract/editconfirm                           @controllers.admin.ContractController.editconfirm
+POST     /contract/update                           @controllers.admin.ContractController.update
+GET     /contract/editsuccess                           @controllers.admin.ContractController.editsuccess
+POST    /contract/remove/:id                     @controllers.admin.ContractController.delete(id : Long)
 # ※ページ設定はグループ最後に記述しないとおかしな動きになる
 GET     /contract/:page                          @controllers.admin.ContractController.index(page: Integer)
 GET     /contract/pagenation/:page                    @controllers.admin.ContractController.pagenation(page: Int, pagename: String)
