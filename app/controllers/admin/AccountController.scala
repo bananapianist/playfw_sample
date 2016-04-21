@@ -34,7 +34,7 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   val UserAccountSv = userAccountService
 
   Logger.info("start Actaor")
-  val mailsendActor = system.actorOf(MailsendActor.props(mc), "mailclient-actor")
+  val mailsendActor = system.actorOf(MailsendActor.props(mc), "mailclient-actor"+ scala.util.Random.alphanumeric.take(10).mkString )
   var cl = Calendar.getInstance
   cl.set(Calendar.SECOND, 0)
   cl.set(Calendar.MILLISECOND, 0)
