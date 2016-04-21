@@ -48,6 +48,8 @@ GET     /customer/pagenation/:page                    @controllers.admin.Custome
 
 # Contract page
 GET     /contract                          @controllers.admin.ContractController.index(page: Integer = 1)
+GET     /contract/regist                           @controllers.admin.ContractController.add
+POST    /contract/create                     @controllers.admin.ContractController.create
 # ※ページ設定はグループ最後に記述しないとおかしな動きになる
 GET     /contract/:page                          @controllers.admin.ContractController.index(page: Integer)
 GET     /contract/pagenation/:page                    @controllers.admin.ContractController.pagenation(page: Int, pagename: String)

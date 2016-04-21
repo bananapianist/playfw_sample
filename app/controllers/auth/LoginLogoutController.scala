@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 import java.util.Date
-import scala.concurrent.Future
 import javax.inject.Inject
 import services._
 import services.dao._

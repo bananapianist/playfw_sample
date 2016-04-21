@@ -34,6 +34,13 @@ class BillDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDA
     dbConfig.db.run(billquery.filter(_.id === id).result.headOption)
   }
 
+  def findByContractId(contractid: Long): Future[Seq[BillRow]] = {
+    dbConfig.db.run(billquery.filter(_.contractId === contractid).sortBy(c => c.id.desc).result)
+  }
+
+  def findByContractIdhasOne(contractid: Long): Future[Option[BillRow]] = {
+    dbConfig.db.run(billquery.filter(_.contractId === contractid).sortBy(c => c.id.desc).result.headOption)
+  }
 
   def create(bill: BillRow): Future[Int] = {
     val c = bill.copy(

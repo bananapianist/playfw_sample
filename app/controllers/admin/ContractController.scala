@@ -1,7 +1,7 @@
 package controllers.admin
 
 import scala.concurrent.Future
-import scala.concurrent.Future.{successful => future}
+import scala.concurrent.Future.{ successful => future }
 
 import controllers.auth.AuthConfigAdminImpl
 import forms._
@@ -27,7 +27,7 @@ import utilities.auth.Role._
 import utilities.config._
 import utilities._
 
-class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, contractDao: ContractDAO, ContractForm:ContractForm, BillForm:BillForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
+class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, contractDao: ContractDAO, billDao: BillDAO, customertDao: CustomerDAO, ContractBillForm:ContractBillForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   
   val UserAccountSv = userAccountService
   
@@ -45,29 +45,36 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
       }
    }
   }
-//  def add = addToken{
-//    AuthorizationAction(NormalUser) {implicit request =>
-//      Ok(views.html.contract.regist("", ContractForm.form))
-//    }
-//  }
-//  
-//  def create = checkToken{
-//    AuthorizationAction(NormalUser).async { implicit request =>
-//      ContractForm.form.bindFromRequest.fold(
-//          formWithErrors => {
-//            Logger.debug(formWithErrors.toString())
-//            Future(BadRequest(views.html.contract.regist("エラー", formWithErrors)))
-//          },
-//          contract => {
-//            contractDao.create(contract).flatMap(cnt =>
-//                //if (cnt != 0) contractDao.all().map(contracts => Ok(views.html.contract.list("登録しました", contracts)))
-//                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
-//                else contractDao.all().map(notifications => BadRequest(views.html.contract.edit("エラー", ContractForm.form.fill(contract))))
-//             )
-//          }
-//      )
-//    }
-//  }
+  def add = addToken{
+    AuthorizationAction(NormalUser).async {implicit request =>
+      val customerOptions = for {
+         options <- customertDao.getValidListForSelectOption()
+      } yield (options)
+      customerOptions.map { case (options) =>
+         Ok(views.html.contract.regist("", ContractBillForm.form, options))
+      }
+    }
+  }
+  
+  def create = checkToken{
+    AuthorizationAction(NormalUser).async { implicit request =>
+        ContractBillForm.form.bindFromRequest.fold(
+          formWithErrors => {
+            Logger.debug(formWithErrors.toString())
+            customertDao.getValidListForSelectOption().map(options => 
+               BadRequest(views.html.contract.regist("エラー", formWithErrors, options))
+            )
+          },
+          contractbill => {
+            contractDao.createWithBill(contractbill).flatMap(implicit cnt =>
+                if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
+                else Future.successful(Redirect(controllers.admin.routes.ContractController.index(1)))
+             )
+          }
+        )
+      
+    }
+  }
 //   
 //  def edit(contractId: Long) = addToken{
 //    AuthorizationAction(NormalUser).async {implicit request =>
@@ -106,15 +113,19 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
 //    }
 //  }
 //  
-//  def editadvance(contractId: Long) = addToken{
+//  def edit(contractId: Long) = addToken{
 //    AuthorizationAction(NormalUser).async {implicit request =>
 //      cache.remove(FormConfig.FormCacheKey + "-contractedit-" + request.session.get("uuid"))
-//      contractDao.findById(contractId).flatMap(option =>
-//        option match {
-//          case Some(contract) => Future(Ok(views.html.contract.editadvance("GET", ContractForm.form.fill(contract))))
+//      val customerOptions = for {
+//         contract <- contractDao.findById(contractId)
+//         bill <- billDao.findByContractIdhasOne(contractId)
+//         options <- customertDao.getValidListForSelectOption()
+//      } yield (contract, bill, options)
+//      customerOptions.map { case (contract) =>
+//         Ok(views.html.contract.regist("", ContractBillForm.form, options))
+//          case Some(contract) => FFuture(Ok(views.html.contract.edit("GET", ContractForm.form.fill(contract))))
 //          case None => Future.successful(Status(404)(views.html.errors.error404notfound("no found")))
-//        }
-//      )
+//      }
 //    }
 //  }
 //  def editadvanceback = addToken{

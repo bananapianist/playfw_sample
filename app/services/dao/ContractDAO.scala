@@ -59,22 +59,18 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     dbConfig.db.run(contractquery += c)
   }
 
-    def create(contract: ContractRow, bill: BillRow): Future[Long] = {
-    val contractnew = contract.copy(
-        isDisabled = Option(false),
-        createdDate = Option(new Date),
-        updatedDate = new Date
-    )
-    val action =
-    (for {
+    def createWithBill(contractbill: ContractBillRow): Future[Long] = {
+      val contractnew = new ContractRow(0, contractbill.customerId, contractbill.status, contractbill.comment, contractbill.contractDate, contractbill.cancelDate, Option(false), Option(new Date),new Date)
+      val action =
+      (for {
        newId <- (contractquery returning contractquery.map(_.id) += contractnew)
        // その結果を使って更新
-       _ <- billquery += bill.copy(
+       _ <- billquery += contractbill.bill.copy(
            contractId = newId,
            createdDate = Option(new Date),
             updatedDate = new Date
            )
-    } yield newId )
+    } yield (newId) )
 
      dbConfig.db.run(action.transactionally)
   }

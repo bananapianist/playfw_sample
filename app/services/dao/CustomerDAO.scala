@@ -92,6 +92,14 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
   
   def delete(id: Long): Future[Int] = dbConfig.db.run(customerquery.filter(_.id === id).delete)
 
+  def getValidListForSelectOption(): Future[Seq[(String,String)]] = {
+    val query = (for {
+      customer <- customerquery.filter(n => (n.isDisabled === false)).sortBy(c => c.id.desc)
+    } yield (customer.id, customer.name))
+    
+    dbConfig.db.run(query.result.map(rows => rows.map{case (id, name) => (id.toString, name.getOrElse(""))}))
+  }
+
   private def calcNotificationDate(actionDate: Date, notificationPeriod: Int): Date = {
     val cl = Calendar.getInstance
     cl.setTime(actionDate)

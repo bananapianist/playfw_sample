@@ -23,7 +23,7 @@ trait TablesExtend {
   )
   
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Account.schema ++ Customer.schema ++ PlayEvolutions.schema
+  lazy val schema: profile.SchemaDescription = Account.schema ++ Bill.schema ++ Contract.schema ++ Customer.schema ++ PlayEvolutions.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -147,6 +147,10 @@ trait TablesExtend {
   /** Collection-like TableQuery object for table Contract */
   lazy val Contract = new TableQuery(tag => new Contract(tag))
 
+  
+  case class ContractBillRow(id: Long, customerId: Long, status: Option[String] = None, comment: Option[String] = None, contractDate: Option[Date] = None, cancelDate: Option[Date] = None, isDisabled: Option[Boolean] = None, createdDate: Option[Date] = None, updatedDate: Date, bill: BillRow)
+
+    
   /** Entity class storing rows of table Customer
    *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(VARCHAR), Length(255,true), Default(None)
