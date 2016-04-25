@@ -7,5 +7,5 @@
 	@b4.text( formaccount("name"), '_label -> "名前", 'placeholder -> "山田太郎" )
 	@b4.email( formaccount("email"), '_label -> "メール", 'placeholder -> "eee@eee.kk" )
 	@b4.password( formaccount("password"), '_label -> "パスワード", 'placeholder -> "" )
-	@b4.select( formaccount("role"), options = utilities.ViewHelper.makeOptionSeq(Seq(utilities.auth.Role.AdministratorRole,utilities.auth.Role.NormalUserRole), "view.account.role", messages), '_label -> "権限" )
+	@b4.select( formaccount("role"), options = utilities.ViewHelper.makeOptionSeq(utilities.auth.Role.statusSeq, "view.account.role", messages), '_label -> "ステータス" )
  

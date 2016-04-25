@@ -1,0 +1,27 @@
+@(message: String, formcontractbill: Form[models.TablesExtend.ContractBillRow], customerList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
+
+
+@main("編集画面") {
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">編集画面</h3>
+                    </div>
+    <p>@message</p>
+
+    @b4.form(action=admin.routes.ContractController.editconfirm) {
+        <input type="hidden" name="id" value="@formcontractbill("id").value">
+        @CSRF.formField
+		@views.html.contract.form(formcontractbill,customerList)
+		@b4.submit('class -> "btn btn-primary"){確認}
+    }
+
+    </div>
+    <p><a href="@admin.routes.ContractController.index(1)" class="btn btn-link">一覧</a></p>
+    </div>
+    </div>
+}

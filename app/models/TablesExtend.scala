@@ -23,7 +23,7 @@ trait TablesExtend {
   )
   
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Account.schema ++ Customer.schema ++ PlayEvolutions.schema
+  lazy val schema: profile.SchemaDescription = Account.schema ++ Bill.schema ++ Contract.schema ++ Customer.schema ++ PlayEvolutions.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -62,6 +62,95 @@ trait TablesExtend {
   /** Collection-like TableQuery object for table Account */
   lazy val Account = new TableQuery(tag => new Account(tag))
 
+  /** Entity class storing rows of table Bill
+   *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
+   *  @param contractId Database column contract_id SqlType(BIGINT)
+   *  @param billName Database column bill_name SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param billEmail Database column bill_email SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param billTel Database column bill_tel SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param billAddress Database column bill_address SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param createdDate Database column created_date SqlType(DATETIME), Default(None)
+   *  @param updatedDate Database column updated_date SqlType(TIMESTAMP) */
+  case class BillRow(id: Long, contractId: Long, billName: Option[String] = None, billEmail: Option[String] = None, billTel: Option[String] = None, billAddress: Option[String] = None, createdDate: Option[Date] = None, updatedDate: Date)
+  /** GetResult implicit for fetching BillRow objects using plain SQL queries */
+  implicit def GetResultBillRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[Date]], e3: GR[Date]): GR[BillRow] = GR{
+    prs => import prs._
+    BillRow.tupled((<<[Long], <<[Long], <<?[String], <<?[String], <<?[String], <<?[String], <<?[Date], <<[Date]))
+  }
+  /** Table description of table bill. Objects of this class serve as prototypes for rows in queries. */
+  class Bill(_tableTag: Tag) extends Table[BillRow](_tableTag, "bill") {
+    def * = (id, contractId, billName, billEmail, billTel, billAddress, createdDate, updatedDate) <> (BillRow.tupled, BillRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(contractId), billName, billEmail, billTel, billAddress, createdDate, Rep.Some(updatedDate)).shaped.<>({r=>import r._; _1.map(_=> BillRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(BIGINT), AutoInc, PrimaryKey */
+    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column contract_id SqlType(BIGINT) */
+    val contractId: Rep[Long] = column[Long]("contract_id")
+    /** Database column bill_name SqlType(VARCHAR), Length(255,true), Default(None) */
+    val billName: Rep[Option[String]] = column[Option[String]]("bill_name", O.Length(255,varying=true), O.Default(None))
+    /** Database column bill_email SqlType(VARCHAR), Length(255,true), Default(None) */
+    val billEmail: Rep[Option[String]] = column[Option[String]]("bill_email", O.Length(255,varying=true), O.Default(None))
+    /** Database column bill_tel SqlType(VARCHAR), Length(255,true), Default(None) */
+    val billTel: Rep[Option[String]] = column[Option[String]]("bill_tel", O.Length(255,varying=true), O.Default(None))
+    /** Database column bill_address SqlType(VARCHAR), Length(255,true), Default(None) */
+    val billAddress: Rep[Option[String]] = column[Option[String]]("bill_address", O.Length(255,varying=true), O.Default(None))
+    /** Database column created_date SqlType(DATETIME), Default(None) */
+    val createdDate: Rep[Option[Date]] = column[Option[Date]]("created_date", O.Default(None))
+    /** Database column updated_date SqlType(TIMESTAMP) */
+    val updatedDate: Rep[Date] = column[Date]("updated_date")
+  }
+  /** Collection-like TableQuery object for table Bill */
+  lazy val Bill = new TableQuery(tag => new Bill(tag))
+
+  /** Entity class storing rows of table Contract
+   *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
+   *  @param customerId Database column customer_id SqlType(BIGINT)
+   *  @param status Database column status SqlType(VARCHAR), Length(50,true), Default(None)
+   *  @param comment Database column comment SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
+   *  @param contractDate Database column contract_date SqlType(DATETIME), Default(None)
+   *  @param cancelDate Database column cancel_date SqlType(DATETIME), Default(None)
+   *  @param isDisabled Database column is_disabled SqlType(TINYINT), Default(None)
+   *  @param createdDate Database column created_date SqlType(DATETIME), Default(None)
+   *  @param updatedDate Database column updated_date SqlType(TIMESTAMP) */
+  case class ContractRow(id: Long, customerId: Long, status: Option[String] = None, comment: Option[String] = None, contractDate: Option[Date] = None, cancelDate: Option[Date] = None, isDisabled: Option[Boolean] = None, createdDate: Option[Date] = None, updatedDate: Date)
+  /** GetResult implicit for fetching ContractRow objects using plain SQL queries */
+  implicit def GetResultContractRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[Date]], e3: GR[Option[Boolean]], e4: GR[Date]): GR[ContractRow] = GR{
+    prs => import prs._
+    ContractRow.tupled((<<[Long], <<[Long], <<?[String], <<?[String], <<?[Date], <<?[Date], <<?[Boolean], <<?[Date], <<[Date]))
+  }
+  /** Table description of table contract. Objects of this class serve as prototypes for rows in queries. */
+  class Contract(_tableTag: Tag) extends Table[ContractRow](_tableTag, "contract") {
+    def * = (id, customerId, status, comment, contractDate, cancelDate, isDisabled, createdDate, updatedDate) <> (ContractRow.tupled, ContractRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(customerId), status, comment, contractDate, cancelDate, isDisabled, createdDate, Rep.Some(updatedDate)).shaped.<>({r=>import r._; _1.map(_=> ContractRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(BIGINT), AutoInc, PrimaryKey */
+    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column customer_id SqlType(BIGINT) */
+    val customerId: Rep[Long] = column[Long]("customer_id")
+    /** Database column status SqlType(VARCHAR), Length(50,true), Default(None) */
+    val status: Rep[Option[String]] = column[Option[String]]("status", O.Length(50,varying=true), O.Default(None))
+    /** Database column comment SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
+    val comment: Rep[Option[String]] = column[Option[String]]("comment", O.Length(16777215,varying=true), O.Default(None))
+    /** Database column contract_date SqlType(DATETIME), Default(None) */
+    val contractDate: Rep[Option[Date]] = column[Option[Date]]("contract_date", O.Default(None))
+    /** Database column cancel_date SqlType(DATETIME), Default(None) */
+    val cancelDate: Rep[Option[Date]] = column[Option[Date]]("cancel_date", O.Default(None))
+    /** Database column is_disabled SqlType(TINYINT), Default(None) */
+    val isDisabled: Rep[Option[Boolean]] = column[Option[Boolean]]("is_disabled", O.Default(None))
+    /** Database column created_date SqlType(DATETIME), Default(None) */
+    val createdDate: Rep[Option[Date]] = column[Option[Date]]("created_date", O.Default(None))
+    /** Database column updated_date SqlType(TIMESTAMP) */
+    val updatedDate: Rep[Date] = column[Date]("updated_date")
+  }
+  /** Collection-like TableQuery object for table Contract */
+  lazy val Contract = new TableQuery(tag => new Contract(tag))
+
+  
+  case class ContractBillRow(id: Long, customerId: Long, status: Option[String] = None, comment: Option[String] = None, contractDate: Option[Date] = None, cancelDate: Option[Date] = None, isDisabled: Option[Boolean] = None, createdDate: Option[Date] = None, updatedDate: Date, bill: BillRow)
+
+    
   /** Entity class storing rows of table Customer
    *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(VARCHAR), Length(255,true), Default(None)

@@ -74,3 +74,8 @@ view.customer.notificationPeriod.25=25分前
 view.customer.notificationPeriod.30=30分前
 view.customer.notificationPeriod.45=45分前
 view.customer.notificationPeriod.60=1時間前
+
+view.contract.status.Active=有効
+view.contract.status.Approval=仮認証
+view.contract.status.Stopped=停止
+view.contract.status.InActive=無効

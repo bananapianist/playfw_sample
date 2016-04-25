@@ -1,7 +1,7 @@
 package utilities.auth
 
 import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
+
 
 sealed trait Role
 
@@ -19,5 +19,7 @@ object Role {
   val AdministratorRole = "Administrator"
   val NormalUserRole = "NormalUser"
   //val options = Seq("Administrator" -> Messages("view.formparts.administrator"), "NormalUser" -> Messages("view.formparts.normaluser"))
+
+  val statusSeq = Seq(AdministratorRole, NormalUserRole)
 
 }
