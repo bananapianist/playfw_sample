@@ -16,6 +16,8 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
+import utilities._
+
 class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDAO[CustomerRow, Long]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val customerquery = TableQuery[Customer]
@@ -98,6 +100,13 @@ class CustomerDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     } yield (customer.id, customer.name))
     
     dbConfig.db.run(query.result.map(rows => rows.map{case (id, name) => (id.toString, name.getOrElse(""))}))
+  }
+
+  def findByNameList(name: String): Future[Seq[String]] = {
+    val query = (for {
+      customer <- customerquery.filter(n => (n.isDisabled === false) && ( (n.name like (name + "%")) || ( n.name like (StringHelper.convertHiraganaToKatakana(name) + "%")) || ( n.name like (StringHelper.convertKatakanaToHiragana(name) + "%")))).sortBy(c => c.id.desc)
+    } yield (customer.name))
+    dbConfig.db.run(query.result.map(rows => rows.map{case (name) => (name.getOrElse(""))}))
   }
 
   private def calcNotificationDate(actionDate: Date, notificationPeriod: Int): Date = {

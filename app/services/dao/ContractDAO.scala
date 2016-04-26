@@ -31,9 +31,9 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     dbConfig.db.run(contractquery.sortBy(c => c.id.desc).length.result)
   }
 
-  def paginglist(page: Int, offset: Int): Future[(Int, Seq[((ContractRow, CustomerRow),Option[BillRow])])] = {
-    val joinquery = (for{
-      contractlist <- contractquery join customerquery on (_.customerId === _.id) joinLeft billquery on (_._1.id === _.contractId)
+  def paginglist(page: Int, offset: Int, urlquery: Map[String, String]): Future[(Int, Seq[((ContractRow, CustomerRow),Option[BillRow])])] = {
+    var joinquery = (for{
+      contractlist <- filterQueryContract(contractquery, billquery,urlquery) join filterQueryCustomer(customerquery, urlquery) on (_.customerId === _.id) joinLeft billquery on (_._1.id === _.contractId)
     }yield (contractlist)
     ).sortBy(contractlist => contractlist._1._1.id.desc)
 
@@ -44,6 +44,7 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     )
     dbConfig.db.run(pagelistsql.transactionally)
   }
+
 
   def findById(id: Long): Future[Option[ContractRow]] = {
     dbConfig.db.run(contractquery.filter(_.id === id).result.headOption)
@@ -159,6 +160,68 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
          _ <- billquery.filter(_.contractId === id).delete
       }yield (deleteContractId) )
     dbConfig.db.run(action.transactionally)
+  }
+  
+  def filterQueryContract(tablequery:TableQuery[Contract], subtablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.isDisabled === false)
+    if((urlquery contains "customerId") && urlquery("customerId") != "-1"){
+      returnquery = returnquery.filter(_.customerId === urlquery("customerId").toLong.bind) 
+    }
+    if((urlquery contains "status") && urlquery("status") != "-1"){
+      returnquery = returnquery.filter(_.status === urlquery("status").bind) 
+    }
+//    if(urlquery contains "contractDateFrom"){
+//      returnquery = returnquery.filter(_.contractDate > urlquery("contractDateFrom").bind) 
+//    }
+//    if(urlquery contains "contractDateTo"){
+//      returnquery = returnquery.filter(_.contractDate < urlquery("contractDateTo").bind) 
+//    }
+//    if(urlquery contains "cancelDateFrom"){
+//      returnquery = returnquery.filter(_.cancelDate > urlquery("cancelDateFrom").bind) 
+//    }
+//    if(urlquery contains "contractDateTo"){
+//      returnquery = returnquery.filter(_.cancelDate < urlquery("cancelDateTo").bind) 
+//    }
+    if((urlquery contains "billName") || (urlquery contains "billEmail") || (urlquery contains "billTel") || (urlquery contains "billAddress")){
+      var subquery = subtablequery.filter(_.id > 0.toLong)
+      if(urlquery contains "billName"){
+        subquery = subquery.filter(_.billName like (urlquery("billName") + "%").bind) 
+      }
+      if(urlquery contains "billEmail"){
+        subquery = subquery.filter(_.billEmail like (urlquery("billEmail") + "%").bind) 
+      }
+      if(urlquery contains "billTel"){
+        subquery = subquery.filter(_.billTel like (urlquery("billTel") + "%").bind) 
+      }
+      if(urlquery contains "billAddress"){
+        subquery = subquery.filter(_.billAddress like (urlquery("billAddress") + "%").bind) 
+      }
+      returnquery = returnquery.filter(_.id in subquery.map(_.contractId)) 
+    }
+    returnquery
+  }
+  def filterQueryBill(tablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.id > 0.toLong)
+    if(urlquery contains "billName"){
+      returnquery = returnquery.filter(_.billName like (urlquery("billName") + "%").bind) 
+    }
+    if(urlquery contains "billEmail"){
+      returnquery = returnquery.filter(_.billEmail like (urlquery("billEmail") + "%").bind) 
+    }
+    if(urlquery contains "billTel"){
+      returnquery = returnquery.filter(_.billTel like (urlquery("billTel") + "%").bind) 
+    }
+    if(urlquery contains "billAddress"){
+      returnquery = returnquery.filter(_.billAddress like (urlquery("billAddress") + "%").bind) 
+    }
+    returnquery
+  }
+  def filterQueryCustomer(tablequery:TableQuery[Customer], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.id > 0.toLong)
+    if(urlquery contains "customerName"){
+      returnquery = returnquery.filter(_.name like (urlquery("customerName") + "%").bind) 
+    }
+    returnquery
   }
 
 }

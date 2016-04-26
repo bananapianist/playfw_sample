@@ -41,6 +41,8 @@ POST     /customer/editadvance                           @controllers.admin.Cust
 POST     /customer/editadvanceconfirm                           @controllers.admin.CustomerController.editadvanceconfirm
 POST     /customer/updateadvance                           @controllers.admin.CustomerController.updateadvance
 GET     /customer/editadvancesuccess                           @controllers.admin.CustomerController.editadvancesuccess
+GET     /customer/nameautocomplete                           @controllers.admin.CustomerController.nameautocomplete(name: String)
+
 
 # ※ページ設定はグループ最後に記述しないとおかしな動きになる
 GET     /customer/:page                          @controllers.admin.CustomerController.index(page: Integer)
@@ -48,6 +50,7 @@ GET     /customer/pagenation/:page                    @controllers.admin.Custome
 
 # Contract page
 GET     /contract                          @controllers.admin.ContractController.index(page: Integer = 1)
+GET     /contract/search                          @controllers.admin.ContractController.search(page: Integer = 1)
 GET     /contract/regist                           @controllers.admin.ContractController.add
 POST    /contract/create                     @controllers.admin.ContractController.create
 GET     /contract/edit/:id                           @controllers.admin.ContractController.edit(id : Long)

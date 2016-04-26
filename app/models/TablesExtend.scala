@@ -150,6 +150,8 @@ trait TablesExtend {
   
   case class ContractBillRow(id: Long, customerId: Long, status: Option[String] = None, comment: Option[String] = None, contractDate: Option[Date] = None, cancelDate: Option[Date] = None, isDisabled: Option[Boolean] = None, createdDate: Option[Date] = None, updatedDate: Date, bill: BillRow)
 
+  case class ContractBillSearchRow(customerId: Option[Long] = None, customerName: Option[String] = None,  status: Option[String] = None, contractDateFrom: Option[Date] = None, contractDateTo: Option[Date] = None, cancelDateFrom: Option[Date] = None, cancelDateTo: Option[Date] = None, billName: Option[String] = None, billEmail: Option[String] = None, billTel: Option[String] = None, billAddress: Option[String] = None)
+
     
   /** Entity class storing rows of table Customer
    *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
