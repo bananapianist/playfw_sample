@@ -50,7 +50,7 @@ GET     /customer/pagenation/:page                    @controllers.admin.Custome
 
 # Contract page
 GET     /contract                          @controllers.admin.ContractController.index(page: Integer = 1)
-GET     /contract/search                          @controllers.admin.ContractController.search(page: Integer = 1)
+#GET     /contract/search                          @controllers.admin.ContractController.search(page: Integer = 1)
 GET     /contract/regist                           @controllers.admin.ContractController.add
 POST    /contract/create                     @controllers.admin.ContractController.create
 GET     /contract/edit/:id                           @controllers.admin.ContractController.edit(id : Long)

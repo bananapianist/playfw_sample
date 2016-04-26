@@ -38,21 +38,21 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   val Home = Redirect(controllers.admin.routes.ContractController.index(1))
 
   
+//  def index(page: Int = 1) = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      val urlquery: Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
+//      val pagenationOptions = for {
+//         (pagecount,contracts) <- contractDao.paginglist(page, pageOffset, urlquery)
+//         options <- customertDao.getValidListForSelectOption()
+//      } yield ((pagecount,contracts), options)
+//
+//      pagenationOptions.map{case ((pagecount,contracts), options) =>
+//          Ok(views.html.contract.list("", contracts.toList, ContractBillSearchForm.form, options, new PageNation(page, pagecount, pageOffset)))
+//
+//      }
+//   }
+//  }
   def index(page: Int = 1) = addToken{
-    AuthorizationAction(NormalUser).async {implicit request =>
-      val urlquery: Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
-      val pagenationOptions = for {
-         (pagecount,contracts) <- contractDao.paginglist(page, pageOffset, urlquery)
-         options <- customertDao.getValidListForSelectOption()
-      } yield ((pagecount,contracts), options)
-
-      pagenationOptions.map{case ((pagecount,contracts), options) =>
-          Ok(views.html.contract.list("", contracts.toList, ContractBillSearchForm.form, options, new PageNation(page, pagecount, pageOffset)))
-
-      }
-   }
-  }
-  def search(page: Int = 1) = addToken{
    AuthorizationAction(NormalUser).async {implicit request =>
      val urlquery: Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
      ContractBillSearchForm.form.bindFromRequest.fold(
@@ -190,8 +190,8 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   
   def pagenation(currentPageNum: Int, pageName: String) = AuthorizationAction(NormalUser) { implicit request =>
     pageName match {
-      case "index" => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
-      case _       => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
+      case "index" => Redirect(ViewHelper.addRequestQuery(controllers.admin.routes.ContractController.index(currentPageNum), request))
+      case _       => Redirect(ViewHelper.addRequestQuery(controllers.admin.routes.ContractController.index(currentPageNum), request))
     }
   }
 }

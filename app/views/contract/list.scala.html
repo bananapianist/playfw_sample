@@ -9,7 +9,7 @@
     <p>@message</p>
        <div class="row">
             <div class="col-md-10 col-md-offset-1">
-    @b4.form(action=admin.routes.ContractController.search) {
+    @b4.form(action=admin.routes.ContractController.index(1)) {
 		@views.html.contract.searchform(formcontractbillsearch,customerList)
 		<div class="col-md-10">
 		@b4.submit('class -> "btn btn-primary"){検索}

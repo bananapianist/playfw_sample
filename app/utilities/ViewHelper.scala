@@ -7,6 +7,7 @@ import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 
  import play.api.Logger
+ import play.api.mvc.RequestHeader
 
 object ViewHelper {
   def nl2br(inputstr: Option[String], withescape:Boolean = true):String ={
@@ -49,5 +50,11 @@ object ViewHelper {
   def getOptionView(optionval:String, maplist:Map[String, String]):String = {
     maplist(optionval)
     
+  }
+  
+  def addRequestQuery(url: play.api.mvc.Call, request: RequestHeader):String ={
+    url + "?" + request.queryString.map {
+      case (k,v) => (k + "=" + v.mkString)
+    }.mkString("&")
   }
 }
