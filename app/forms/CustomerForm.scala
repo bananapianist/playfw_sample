@@ -7,6 +7,7 @@ import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
+import utilities._
 
 class CustomerForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
     val form = Form(
@@ -15,7 +16,7 @@ class CustomerForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
       "name" -> text.verifying(Messages("error.required", "名前"), {!_.isEmpty})
                             .verifying(Messages("error.maxLength", 10),{_.length <= 10 })
                             .verifying(Messages("error.minLength", 4),{_.length >=4}),
-      "email" -> email,
+      "email" -> text.verifying(ValidationHelper.emailAddress),
       "tel" -> text.verifying(pattern("""[0-9a-zA-Z-]+""".r,error=Messages("error.alphabet"))),
       "address" -> text.verifying(Messages("error.required", "住所"), {!_.isEmpty}),
       "comment" -> text.verifying(Messages("error.maxLength", 255),{_.length <= 255 }),

@@ -9,7 +9,7 @@ import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
 import utilities._
 
-class LoginForm @Inject()(val messagesApi: MessagesApi)(implicit ValidationHelper: ValidationHelper) extends I18nSupport{
+class LoginForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
   val loginForm = Form(
     mapping(
       "email" -> text.verifying(Messages("email または password　が違います"), {!_.isEmpty})

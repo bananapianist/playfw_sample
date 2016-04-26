@@ -7,12 +7,13 @@ import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
+import utilities._
 
 class AccountForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
     val formnew = Form(
     mapping(
       "id" -> optional(number),
-      "email" -> email,
+      "email" -> text.verifying(ValidationHelper.emailAddress),
       "password" -> text.verifying(Messages("error.required", "パスワード"), {!_.isEmpty})
                                   .verifying(Messages("error.maxLength", 10),{_.length <= 50 })
                             .verifying(Messages("error.minLength", 4),{_.length >=4}),
