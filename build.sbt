@@ -34,6 +34,8 @@ libraryDependencies ++= Seq(
 //  "org.webjars" %% "webjars-play" % "2.4.0-1",
 //  "org.webjars" % "bootstrap" % "3.2.0",
   "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B4",		//****Bootstrap***
+  "org.webjars.bower" % "jquery" % "2.1.3",					//****jquery-ui***
+  "org.webjars" % "jquery-ui" % "1.11.4",					//****jquery-ui***
 //  "org.webjars" % "font-awesome" % "4.5.0",
 //  "org.webjars" % "bootstrap-datepicker" % "1.4.0",
   "com.typesafe.play" %% "play-mailer" % "5.0.0-M1",			//****mail plugin***

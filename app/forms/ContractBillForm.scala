@@ -7,6 +7,7 @@ import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
+import utilities._
 
 class ContractBillForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
     val form = Form(
@@ -23,7 +24,7 @@ class ContractBillForm @Inject()(val messagesApi: MessagesApi) extends I18nSuppo
         "billName" -> text.verifying(Messages("error.required", "名前"), {!_.isEmpty})
                               .verifying(Messages("error.maxLength", 10),{_.length <= 10 })
                               .verifying(Messages("error.minLength", 4),{_.length >=4}),
-        "billEmail" -> email,
+        "billEmail" -> text.verifying(ValidationHelper.emailAddress),
         "billTel" -> text.verifying(pattern("""[0-9a-zA-Z-]+""".r,error=Messages("error.alphabet"))),
         "billAddress" -> text.verifying(Messages("error.required", "住所"), {!_.isEmpty}) 
         )(billapply)(billunapply)

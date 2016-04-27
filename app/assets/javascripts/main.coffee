@@ -64,10 +64,10 @@ $ ->
 	$('.select-group select').change ->
 		$(this).parents('.select-group').find('input[type="hidden"]').val $(this).val()
 	
-	$('.input-daterange').datepicker
-		format: "dd-mm-yyyy"
-		todayBtn: "linked"
-		todayHighlight: true
+#	$('.input-daterange').datepicker
+#		format: "dd-mm-yyyy"
+#		todayBtn: "linked"
+#		todayHighlight: true
 
 	$('body[tab="docs"]').scrollspy
 		target: '#sidebar'

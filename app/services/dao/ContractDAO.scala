@@ -16,6 +16,8 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
+import utilities._
+
 class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDAO[ContractRow, Long]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val contractquery = TableQuery[Contract]
@@ -31,9 +33,9 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     dbConfig.db.run(contractquery.sortBy(c => c.id.desc).length.result)
   }
 
-  def paginglist(page: Int, offset: Int): Future[(Int, Seq[((ContractRow, CustomerRow),Option[BillRow])])] = {
-    val joinquery = (for{
-      contractlist <- contractquery join customerquery on (_.customerId === _.id) joinLeft billquery on (_._1.id === _.contractId)
+  def paginglist(page: Int, offset: Int, urlquery: Map[String, String]): Future[(Int, Seq[((ContractRow, CustomerRow),Option[BillRow])])] = {
+    var joinquery = (for{
+      contractlist <- filterQueryContract(contractquery, billquery,urlquery) join filterQueryCustomer(customerquery, urlquery) on (_.customerId === _.id) joinLeft billquery on (_._1.id === _.contractId)
     }yield (contractlist)
     ).sortBy(contractlist => contractlist._1._1.id.desc)
 
@@ -44,6 +46,7 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
     )
     dbConfig.db.run(pagelistsql.transactionally)
   }
+
 
   def findById(id: Long): Future[Option[ContractRow]] = {
     dbConfig.db.run(contractquery.filter(_.id === id).result.headOption)
@@ -159,6 +162,55 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
          _ <- billquery.filter(_.contractId === id).delete
       }yield (deleteContractId) )
     dbConfig.db.run(action.transactionally)
+  }
+  
+  def filterQueryContract(tablequery:TableQuery[Contract], subtablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.isDisabled === false)
+    urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "customerId" => if(querytuple._2 != "-1") returnquery = returnquery.filter(_.customerId === querytuple._2.toLong.bind) 
+          case "status" =>  if(querytuple._2 != "-1") returnquery = returnquery.filter(_.status === StringHelper.trim(querytuple._2).bind) 
+          case "contractDateFrom" => if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "cancelDateFrom" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "billName" | "billEmail" | "billTel" | "billAddress" =>
+            var subquery = subtablequery.filter(_.id > 0.toLong)
+            querytuple._1 match{
+              case "billName" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billName like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billEmail" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billEmail like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billTel" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billTel like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billAddress" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billAddress like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case _ => 
+            }
+            returnquery = returnquery.filter(_.id in subquery.map(_.contractId))
+          case _ => 
+        }
+    }
+    returnquery
+  }
+  def filterQueryBill(tablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.id > 0.toLong)
+     urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "billName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billName like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billEmail" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billEmail like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billTel" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billTel like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billAddress" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billAddress like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case _ => 
+        }
+    }
+    returnquery
+  }
+  def filterQueryCustomer(tablequery:TableQuery[Customer], urlquery: Map[String, String]) = {
+    var returnquery = tablequery.filter(_.id > 0.toLong)
+    urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "customerName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.name like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case _ => 
+        }
+    }
+    returnquery
   }
 
 }

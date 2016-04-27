@@ -27,7 +27,7 @@ import utilities.auth.Role._
 import utilities.config._
 import utilities._
 
-class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, contractDao: ContractDAO, billDao: BillDAO, customertDao: CustomerDAO, ContractBillForm:ContractBillForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
+class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, contractDao: ContractDAO, billDao: BillDAO, customertDao: CustomerDAO, ContractBillForm:ContractBillForm, ContractBillSearchForm:ContractBillSearchForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   
   val UserAccountSv = userAccountService
   
@@ -38,11 +38,42 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   val Home = Redirect(controllers.admin.routes.ContractController.index(1))
 
   
+//  def index(page: Int = 1) = addToken{
+//    AuthorizationAction(NormalUser).async {implicit request =>
+//      val urlquery: Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
+//      val pagenationOptions = for {
+//         (pagecount,contracts) <- contractDao.paginglist(page, pageOffset, urlquery)
+//         options <- customertDao.getValidListForSelectOption()
+//      } yield ((pagecount,contracts), options)
+//
+//      pagenationOptions.map{case ((pagecount,contracts), options) =>
+//          Ok(views.html.contract.list("", contracts.toList, ContractBillSearchForm.form, options, new PageNation(page, pagecount, pageOffset)))
+//
+//      }
+//   }
+//  }
   def index(page: Int = 1) = addToken{
-    AuthorizationAction(NormalUser).async {implicit request =>
-      contractDao.paginglist(page, pageOffset).map{case (pagecount,contracts) =>
-        Ok(views.html.contract.list("", contracts.toList, new PageNation(page, pagecount, pageOffset)))
-      }
+   AuthorizationAction(NormalUser).async {implicit request =>
+     val urlquery: Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
+     ContractBillSearchForm.form.bindFromRequest.fold(
+        formWithErrors => {
+          Logger.debug(formWithErrors.toString())
+          customertDao.getValidListForSelectOption().map(options => 
+             BadRequest(views.html.contract.listerror("エラー", formWithErrors, options))
+          )
+        },
+        contractbillsearch => {
+         val pagenationOptions = for {
+             (pagecount,contracts) <- contractDao.paginglist(page, pageOffset, urlquery)
+             options <- customertDao.getValidListForSelectOption()
+          } yield ((pagecount,contracts), options)
+    
+          pagenationOptions.map{case ((pagecount,contracts), options) =>
+              Ok(views.html.contract.list("", contracts.toList, ContractBillSearchForm.form.fill(contractbillsearch), options, new PageNation(page, pagecount, pageOffset)))
+    
+          }
+        }
+     )
    }
   }
   def add = addToken{
@@ -159,8 +190,8 @@ class ContractController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
   
   def pagenation(currentPageNum: Int, pageName: String) = AuthorizationAction(NormalUser) { implicit request =>
     pageName match {
-      case "index" => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
-      case _       => Redirect(controllers.admin.routes.ContractController.index(currentPageNum))
+      case "index" => Redirect(ViewHelper.addRequestQuery(controllers.admin.routes.ContractController.index(currentPageNum), request))
+      case _       => Redirect(ViewHelper.addRequestQuery(controllers.admin.routes.ContractController.index(currentPageNum), request))
     }
   }
 }

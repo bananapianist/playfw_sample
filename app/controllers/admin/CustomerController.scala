@@ -27,6 +27,8 @@ import utilities.auth.Role._
 import utilities.config._
 import utilities._
 
+import play.api.libs.json._
+
 class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, cache: CacheApi, cached: Cached, val userAccountService: UserAccountServiceLike, customerDao: CustomerDAO, CustomerForm:CustomerForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   
   val UserAccountSv = userAccountService
@@ -42,6 +44,13 @@ class CustomerController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck
     Ok(s"$name=$value")
   })
   
+  def nameautocomplete(name: String) = addToken{
+    AuthorizationAction(NormalUser).async {implicit request =>
+      customerDao.findByNameList(name).map{case customer =>
+        Ok(Json.toJson(customer))
+      }
+    }
+  }
   
   def index(page: Int = 1) = addToken{
     AuthorizationAction(NormalUser).async {implicit request =>

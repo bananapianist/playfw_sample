@@ -1,8 +1,10 @@
-@(pageNationUtil: utilities.PageNation[_], pageName: String)
+@(pageNationUtil: utilities.PageNation[_], pageName: String)(implicit request: RequestHeader)
+
+
 <nav>
   <ul class="pagination">
-    <li class="@if(pageNationUtil.currentPageNum==1){active}"><a href="@admin.routes.ContractController.pagenation(1, pageName)">&laquo;</a></li>
-    @for(page <- pageNationUtil.pageNumList){<li class="@if(pageNationUtil.currentPageNum==page){active}"><a href="@admin.routes.ContractController.pagenation(page, pageName)">@page</a></li>}
-    <li class="@if(pageNationUtil.currentPageNum==pageNationUtil.totalPageNum){active}"><a href="@admin.routes.ContractController.pagenation(pageNationUtil.totalPageNum, pageName)">&raquo;</a></li>
+    <li class="@if(pageNationUtil.currentPageNum==1){active}"><a href="@utilities.ViewHelper.addRequestQuery(admin.routes.ContractController.pagenation(1, pageName), request)">&laquo;</a></li>
+    @for(page <- pageNationUtil.pageNumList){<li class="@if(pageNationUtil.currentPageNum==page){active}"><a href="@utilities.ViewHelper.addRequestQuery(admin.routes.ContractController.pagenation(page, pageName), request)">@page</a></li>}
+    <li class="@if(pageNationUtil.currentPageNum==pageNationUtil.totalPageNum){active}"><a href="@utilities.ViewHelper.addRequestQuery(admin.routes.ContractController.pagenation(pageNationUtil.totalPageNum, pageName), request)">&raquo;</a></li>
   </ul>
 </nav>

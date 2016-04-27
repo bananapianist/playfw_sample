@@ -1,0 +1,60 @@
+@(formcontractbillsearch: Form[models.TablesExtend.ContractBillSearchRow], customerList: Seq[(String, String)])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+@import utilities._
+@implicitFC = @{ b4.vertical.fieldConstructor }
+@{val customeurl = "data-uri"}
+
+
+
+@if(formcontractbillsearch.hasErrors) {
+<div class="form-group">
+    <div class="alert alert-danger col-lg-6 text-center">
+       @for(error <- formcontractbillsearch.errors){
+         @error<br />
+       }
+   </div>
+</div>
+}
+<div class="row">
+<div class="col-md-3">
+	@b4.select( formcontractbillsearch("customerId"), options = Seq("-1" -> "") ++ customerList, '_label -> "顧客リスト" )
+</div>
+<div class="col-md-3">
+	@b4.text( formcontractbillsearch("customerName"),'_label -> "顧客名", 'class -> "autocomplete", Symbol("data-uri") -> admin.routes.CustomerController.nameautocomplete("") )
+</div>
+<div class="col-md-3">	
+	@b4.select( formcontractbillsearch("status"), options = Seq("-1" -> "") ++ utilities.ViewHelper.makeOptionSeq(utilities.contract.Status.statusSeq, "view.contract.status", messages), '_label -> "ステータス" )
+</div>
+<div class="col-md-3">&nbsp;</div>
+</div>
+<div class="row">
+<div class="col-md-3">
+	@b4.date( formcontractbillsearch("contractDateFrom"),'_label -> "契約日From")
+</div>
+<div class="col-md-3">	
+	@b4.date( formcontractbillsearch("contractDateTo"),'_label -> "契約日To")
+</div>
+<div class="col-md-3">
+	@b4.date( formcontractbillsearch("cancelDateFrom"),'_label -> "解約日From")
+</div>
+<div class="col-md-3">	
+	@b4.date( formcontractbillsearch("cancelDateTo"),'_label -> "解約日To")
+</div>
+</div>
+<div class="row">
+<div class="col-md-3">
+	@b4.text( formcontractbillsearch("billName"), '_label -> "請求先名前", 'placeholder -> "山田太郎" )
+</div>
+<div class="col-md-3">	
+	@b4.email( formcontractbillsearch("billEmail"), '_label -> "請求先メール", 'placeholder -> "example@mail.com" )
+</div>
+<div class="col-md-3">
+	@b4.text( formcontractbillsearch("billTel"), '_label -> "請求先電話番号", 'placeholder -> "02-2333-3333" )
+</div>
+<div class="col-md-3">	
+	@b4.text( formcontractbillsearch("billAddress"), '_label -> "請求先住所", 'placeholder -> "東京都千代田区" )
+ </div> 
+</div>
+  
