@@ -16,6 +16,8 @@ import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
+import utilities._
+
 class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends BaseDAO[ContractRow, Long]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val contractquery = TableQuery[Contract]
@@ -164,62 +166,49 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
   
   def filterQueryContract(tablequery:TableQuery[Contract], subtablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
     var returnquery = tablequery.filter(_.isDisabled === false)
-    if((urlquery contains "customerId") && urlquery("customerId") != "-1"){
-      returnquery = returnquery.filter(_.customerId === urlquery("customerId").toLong.bind) 
-    }
-    if((urlquery contains "status") && urlquery("status") != "-1"){
-      returnquery = returnquery.filter(_.status === urlquery("status").bind) 
-    }
-//    if(urlquery contains "contractDateFrom"){
-//      returnquery = returnquery.filter(_.contractDate > urlquery("contractDateFrom").bind) 
-//    }
-//    if(urlquery contains "contractDateTo"){
-//      returnquery = returnquery.filter(_.contractDate < urlquery("contractDateTo").bind) 
-//    }
-//    if(urlquery contains "cancelDateFrom"){
-//      returnquery = returnquery.filter(_.cancelDate > urlquery("cancelDateFrom").bind) 
-//    }
-//    if(urlquery contains "contractDateTo"){
-//      returnquery = returnquery.filter(_.cancelDate < urlquery("cancelDateTo").bind) 
-//    }
-    if((urlquery contains "billName") || (urlquery contains "billEmail") || (urlquery contains "billTel") || (urlquery contains "billAddress")){
-      var subquery = subtablequery.filter(_.id > 0.toLong)
-      if(urlquery contains "billName"){
-        subquery = subquery.filter(_.billName like (urlquery("billName") + "%").bind) 
-      }
-      if(urlquery contains "billEmail"){
-        subquery = subquery.filter(_.billEmail like (urlquery("billEmail") + "%").bind) 
-      }
-      if(urlquery contains "billTel"){
-        subquery = subquery.filter(_.billTel like (urlquery("billTel") + "%").bind) 
-      }
-      if(urlquery contains "billAddress"){
-        subquery = subquery.filter(_.billAddress like (urlquery("billAddress") + "%").bind) 
-      }
-      returnquery = returnquery.filter(_.id in subquery.map(_.contractId)) 
+    urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "customerId" => if(querytuple._2 != "-1") returnquery = returnquery.filter(_.customerId === querytuple._2.toLong.bind) 
+          case "status" =>  if(querytuple._2 != "-1") returnquery = returnquery.filter(_.status === StringHelper.trim(querytuple._2).bind) 
+          case "contractDateFrom" => if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "cancelDateFrom" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "billName" | "billEmail" | "billTel" | "billAddress" =>
+            var subquery = subtablequery.filter(_.id > 0.toLong)
+            querytuple._1 match{
+              case "billName" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billName like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billEmail" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billEmail like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billTel" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billTel like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case "billAddress" => if(!StringHelper.trim(querytuple._2).isEmpty()) subquery = subquery.filter(_.billAddress like (StringHelper.trim(querytuple._2) + "%").bind) 
+              case _ => 
+            }
+            returnquery = returnquery.filter(_.id in subquery.map(_.contractId))
+          case _ => 
+        }
     }
     returnquery
   }
   def filterQueryBill(tablequery:TableQuery[Bill], urlquery: Map[String, String]) = {
     var returnquery = tablequery.filter(_.id > 0.toLong)
-    if(urlquery contains "billName"){
-      returnquery = returnquery.filter(_.billName like (urlquery("billName") + "%").bind) 
-    }
-    if(urlquery contains "billEmail"){
-      returnquery = returnquery.filter(_.billEmail like (urlquery("billEmail") + "%").bind) 
-    }
-    if(urlquery contains "billTel"){
-      returnquery = returnquery.filter(_.billTel like (urlquery("billTel") + "%").bind) 
-    }
-    if(urlquery contains "billAddress"){
-      returnquery = returnquery.filter(_.billAddress like (urlquery("billAddress") + "%").bind) 
+     urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "billName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billName like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billEmail" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billEmail like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billTel" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billTel like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "billAddress" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.billAddress like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case _ => 
+        }
     }
     returnquery
   }
   def filterQueryCustomer(tablequery:TableQuery[Customer], urlquery: Map[String, String]) = {
     var returnquery = tablequery.filter(_.id > 0.toLong)
-    if(urlquery contains "customerName"){
-      returnquery = returnquery.filter(_.name like (urlquery("customerName") + "%").bind) 
+    urlquery.foreach { querytuple =>
+        querytuple._1 match{
+          case "customerName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.name like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case _ => 
+        }
     }
     returnquery
   }
