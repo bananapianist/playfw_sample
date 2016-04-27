@@ -4,7 +4,8 @@
 @import play.api.i18n.Messages
 @import utilities._
 @implicitFC = @{ b4.vertical.fieldConstructor }
-@{val dataurl="data-url"}
+@{val customeurl = "data-uri"}
+
 
 
 @if(formcontractbillsearch.hasErrors) {
@@ -21,7 +22,7 @@
 	@b4.select( formcontractbillsearch("customerId"), options = Seq("-1" -> "") ++ customerList, '_label -> "顧客リスト" )
 </div>
 <div class="col-md-3">
-	@b4.text( formcontractbillsearch("customerName"),'_label -> "顧客名", 'class -> "autocomplete", 'dataurl -> admin.routes.CustomerController.nameautocomplete("") )
+	@b4.text( formcontractbillsearch("customerName"),'_label -> "顧客名", 'class -> "autocomplete", Symbol("data-uri") -> admin.routes.CustomerController.nameautocomplete("") )
 </div>
 <div class="col-md-3">	
 	@b4.select( formcontractbillsearch("status"), options = Seq("-1" -> "") ++ utilities.ViewHelper.makeOptionSeq(utilities.contract.Status.statusSeq, "view.contract.status", messages), '_label -> "ステータス" )
