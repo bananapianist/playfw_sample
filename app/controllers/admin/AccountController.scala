@@ -39,8 +39,13 @@ class AccountController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck,
   cl.set(Calendar.SECOND, 0)
   cl.set(Calendar.MILLISECOND, 0)
   cl.add(Calendar.MINUTE, 1)
-  system.scheduler.schedule(
-      (cl.getTimeInMillis - System.currentTimeMillis).milliseconds,
+//  system.scheduler.schedule(
+//      (cl.getTimeInMillis - System.currentTimeMillis).milliseconds,
+//      120.seconds,
+//      mailsendActor,
+//      "mailsend"
+//  )
+  system.scheduler.scheduleOnce(
       120.seconds,
       mailsendActor,
       "mailsend"
