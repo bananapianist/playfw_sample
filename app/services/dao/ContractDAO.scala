@@ -173,7 +173,7 @@ class ContractDAO @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Ba
           case "contractDateFrom" => if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
           case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.contractDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
           case "cancelDateFrom" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate >= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
-          case "contractDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
+          case "cancelDateTo" =>  if(!querytuple._2.isEmpty()) returnquery = returnquery.filter(_.cancelDate <= DateHelper.stringToDate(querytuple._2, "yyyy-MM-dd").bind) 
           case "billName" | "billEmail" | "billTel" | "billAddress" =>
             var subquery = subtablequery.filter(_.id > 0.toLong)
             querytuple._1 match{
