@@ -1,0 +1,28 @@
+@(formoauthclientsearch: Form[models.TablesExtend.OauthClientSearchRow], appAccountList: Seq[(String, String)])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+@import utilities._
+@implicitFC = @{ b4.vertical.fieldConstructor }
+@{val customeurl = "data-uri"}
+
+
+
+@if(formoauthclientsearch.hasErrors) {
+<div class="form-group">
+    <div class="alert alert-danger col-lg-6 text-center">
+       @for(error <- formoauthclientsearch.errors){
+         @error<br />
+       }
+   </div>
+</div>
+}
+<div class="row">
+<div class="col-md-6">
+	@b4.select( formoauthclientsearch("applicationId"), options = Seq("-1" -> "") ++ appAccountList, '_label -> "アプリケーションリスト" )
+</div>
+<div class="col-md-6">
+	@b4.text( formoauthclientsearch("applicationName"),'_label -> "アプリケーション名", 'class -> "autocomplete", Symbol("data-uri") -> admin.routes.AppAccountController.nameautocomplete("") )
+</div>
+</div>
+  

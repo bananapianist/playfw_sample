@@ -1,0 +1,53 @@
+@(message: String, oauthclients: List[(models.TablesExtend.OauthClientRow,models.TablesExtend.AppAccountRow)], formoauthclientsearch: Form[models.TablesExtend.OauthClientSearchRow], appAccountList: Seq[(String, String)], page: utilities.PageNation[_])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.vertical.fieldConstructor }
+	
+
+@main("一覧画面") {
+        <h1>一覧画面</h1>
+    <p>@message</p>
+       <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+    @b4.form(action=admin.routes.OauthClientController.index(1)) {
+		@views.html.oauthclient.searchform(formoauthclientsearch,appAccountList)
+		<div class="col-md-12">
+		@b4.submit('class -> "btn btn-primary"){検索}
+		</div>
+        @CSRF.formField
+    }
+    </div>
+    </div>
+    <div class="text-center">
+     @views.html.oauthclient.pageNation(page, "")
+     </div>
+          <table class="table table-striped table-hover ">
+  
+            <tr class="info">
+                <th>ID</th>
+                <th>Client Secret</th>
+                <th>App</th>
+                <th>GrantType</th>
+                  <th></th>
+                 <th></th>
+            </tr>
+    @for((oauthclient, appaccount) <- oauthclients) {
+	        <tr>
+	                <td>@oauthclient.oauthClientId</td>
+	                <td>@oauthclient.clientSecret</td>
+	                <td>@appaccount.name</td>
+	                <td>@oauthclient.grantType</td>
+	        <td><a href="@admin.routes.OauthClientController.edit(oauthclient.oauthClientId)" class="btn btn-link">編集</a></td>
+	        <td>@b4.form(action=admin.routes.OauthClientController.delete(oauthclient.oauthClientId)) {
+	        	@CSRF.formField 
+	        	@b4.submit('class -> "btn btn-link"){削除}}
+	        	</td>
+          </tr>
+    }
+ 		</table>
+    <div class="text-center">
+        @views.html.oauthclient.pageNation(page, "")
+         <p><a href="@admin.routes.OauthClientController.add" class="btn btn-success">新規登録</a></p>
+        </div>
+    </div>
+ 
+ }

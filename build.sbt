@@ -31,6 +31,7 @@ libraryDependencies ++= Seq(
   "jp.t2v" %% "play2-auth-social" % "0.14.2",				//****Auth module***
   "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",		//****Auth module***
   play.sbt.Play.autoImport.cache,
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",	//****OAuth2 Provider***
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.5.0-akka-2.4.x",	//****Schedule Job like cron***
 //  "org.webjars" %% "webjars-play" % "2.4.0-1",
 //  "org.webjars" % "bootstrap" % "3.2.0",
