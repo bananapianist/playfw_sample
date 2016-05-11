@@ -1,4 +1,4 @@
-@(message: String, appaccounts: List[models.TablesExtend.AppAccountRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, oauthusers: List[models.TablesExtend.OauthUserRow])(implicit messages: Messages,request: RequestHeader)
 @import helper._
 @implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
@@ -11,11 +11,11 @@
                   <th></th>
                  <th></th>
             </tr>
-    @for(appaccount <- appaccounts) {
+    @for(oauthuser <- oauthusers) {
 	        <tr>
-	                <td>@appaccount.name</td>
-	        <td><a href="@admin.routes.AppAccountController.edit(appaccount.id)" class="btn btn-link">編集</a></td>
-	        <td>@b4.form(action=admin.routes.AppAccountController.delete(appaccount.id)) {
+	                <td>@oauthuser.name</td>
+	        <td><a href="@admin.routes.OauthUserController.edit(oauthuser.guid.toString)" class="btn btn-link">編集</a></td>
+	        <td>@b4.form(action=admin.routes.OauthUserController.delete(oauthuser.guid.toString)) {
 	        	@CSRF.formField 
 	        	@b4.submit('class -> "btn btn-link"){削除}}
 	        	</td>
@@ -24,7 +24,7 @@
  		</table>
         <div class="text-center">
     <div class="text-center">
-         <p><a href="@admin.routes.AppAccountController.add" class="btn btn-success">新規登録</a></p>
+         <p><a href="@admin.routes.OauthUserController.add" class="btn btn-success">新規登録</a></p>
         </div>
     </div>
  

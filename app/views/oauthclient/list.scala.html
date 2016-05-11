@@ -1,4 +1,4 @@
-@(message: String, oauthclients: List[(models.TablesExtend.OauthClientRow,models.TablesExtend.AppAccountRow)], formoauthclientsearch: Form[models.TablesExtend.OauthClientSearchRow], appAccountList: Seq[(String, String)], page: utilities.PageNation[_])(implicit messages: Messages,request: RequestHeader)
+@(message: String, oauthclients: List[(models.TablesExtend.OauthClientRow,models.TablesExtend.OauthUserRow)], formoauthclientsearch: Form[models.TablesExtend.OauthClientSearchRow], oauthUserList: Seq[(String, String)], page: utilities.PageNation[_])(implicit messages: Messages,request: RequestHeader)
 @import helper._
 @implicitFC = @{ b4.vertical.fieldConstructor }
 	
@@ -9,7 +9,7 @@
        <div class="row">
             <div class="col-md-10 col-md-offset-1">
     @b4.form(action=admin.routes.OauthClientController.index(1)) {
-		@views.html.oauthclient.searchform(formoauthclientsearch,appAccountList)
+		@views.html.oauthclient.searchform(formoauthclientsearch,oauthUserList)
 		<div class="col-md-12">
 		@b4.submit('class -> "btn btn-primary"){検索}
 		</div>
@@ -30,14 +30,14 @@
                   <th></th>
                  <th></th>
             </tr>
-    @for((oauthclient, appaccount) <- oauthclients) {
+    @for((oauthclient, oauthuser) <- oauthclients) {
 	        <tr>
-	                <td>@oauthclient.oauthClientId</td>
+	                <td>@oauthclient.oauthClientId.toString</td>
 	                <td>@oauthclient.clientSecret</td>
-	                <td>@appaccount.name</td>
+	                <td>@oauthuser.name</td>
 	                <td>@oauthclient.grantType</td>
-	        <td><a href="@admin.routes.OauthClientController.edit(oauthclient.oauthClientId)" class="btn btn-link">編集</a></td>
-	        <td>@b4.form(action=admin.routes.OauthClientController.delete(oauthclient.oauthClientId)) {
+	        <td><a href="@admin.routes.OauthClientController.edit(oauthclient.oauthClientId.toString)" class="btn btn-link">編集</a></td>
+	        <td>@b4.form(action=admin.routes.OauthClientController.delete(oauthclient.oauthClientId.toString)) {
 	        	@CSRF.formField 
 	        	@b4.submit('class -> "btn btn-link"){削除}}
 	        	</td>

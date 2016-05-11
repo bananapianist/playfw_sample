@@ -18,17 +18,22 @@ import play.api.db.slick.HasDatabaseConfigProvider
 import play.api.mvc._
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
+import java.util.UUID
 
 import utilities._
+import utilities.oauth.GrantType
 
 
-class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[OauthClientRow, String]{
+class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[OauthClientRow, UUID]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val oauthclientquery = TableQuery[OauthClient]
-  private val appaccountquery = TableQuery[AppAccount]
+  private val oauthuserquery = TableQuery[OauthUser]
  
 
 
+  def validate(id: UUID, secret: Option[String], grantType: String): Future[Int] = {
+    dbConfig.db.run(oauthclientquery.filter(n => (n.oauthClientId === id) && (n.clientSecret === secret) && (n.grantType === grantType)).length.result)
+  }
   
 
   def all(): Future[List[OauthClientRow]] = {
@@ -39,9 +44,9 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(oauthclientquery.sortBy(c => c.oauthClientId.desc).length.result)
   }
 
-  def paginglist(page: Int, offset: Int, urlquery: Map[String, String]): Future[(Int, Seq[(OauthClientRow, AppAccountRow)])] = {
+  def paginglist(page: Int, offset: Int, urlquery: Map[String, String]): Future[(Int, Seq[(OauthClientRow, OauthUserRow)])] = {
     var joinquery = (for{
-      oauthclientlist <- filterQueryOauthClient(oauthclientquery, urlquery) join filterQueryAppAccount(appaccountquery, urlquery) on (_.applicationId === _.id) 
+      oauthclientlist <- filterQueryOauthClient(oauthclientquery, urlquery) join filterQueryOauthUser(oauthuserquery, urlquery) on (_.oauthUserId === _.guid) 
     }yield (oauthclientlist)
     ).sortBy(oauthclientlist => oauthclientlist._1.createdDate.desc)
 
@@ -53,13 +58,17 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(pagelistsql.transactionally)
   }
 
-  def findById(id: String): Future[Option[OauthClientRow]] = {
+  def findById(id: UUID): Future[Option[OauthClientRow]] = {
     dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === id).result.headOption)
+  }
+
+  def findByClientCredentials(clientId: UUID, clientSecret: String): Future[Option[OauthClientRow]] = {
+    dbConfig.db.run(oauthclientquery.filter(n => (n.oauthClientId === clientId) && (n.clientSecret === clientSecret) && (n.grantType === GrantType.ClientCredentialsGrantType)).result.headOption)
   }
 
   def create(oauthclient: OauthClientRow): Future[Int] = {
     val c = oauthclient.copy(
-        oauthClientId = java.util.UUID.randomUUID.toString,
+        oauthClientId = java.util.UUID.randomUUID,
         expiresIn = 0
     )
     dbConfig.db.run(oauthclientquery += c)
@@ -72,7 +81,7 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
   def update_mappinged(oauthclient: OauthClientRow): Future[Int] = {
      dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === oauthclient.oauthClientId).map(
        c => (
-          c.applicationId,
+          c.oauthUserId,
           c.clientSecret,
           c.redirectUri,
           c.grantType,
@@ -80,7 +89,7 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
           )
       ).update(
         (
-        oauthclient.applicationId,
+        oauthclient.oauthUserId,
         oauthclient.clientSecret,
         oauthclient.redirectUri,
         oauthclient.grantType,
@@ -91,24 +100,26 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
 
   }
   
-  def delete(id: String): Future[Int] = dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === id).delete)
+  def delete(id: UUID): Future[Int] = dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === id).delete)
 
   def filterQueryOauthClient(tablequery:TableQuery[OauthClient], urlquery: Map[String, String]) = {
-    var returnquery = tablequery.filterNot(_.oauthClientId === "")
+    val dummyid: UUID = null
+    var returnquery = tablequery.filterNot(_.oauthClientId === dummyid)
     urlquery.foreach { querytuple =>
         querytuple._1 match{
-          case "applicationId" => if(querytuple._2 != "-1") returnquery = returnquery.filter(_.applicationId === querytuple._2.toLong.bind) 
+          case "oauthUserId" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.oauthUserId === java.util.UUID.fromString(querytuple._2).bind) 
           case _ => 
         }
     }
     returnquery
   }
 
-  def filterQueryAppAccount(tablequery:TableQuery[AppAccount], urlquery: Map[String, String]) = {
-    var returnquery = tablequery.filter(_.id > 0.toLong)
+  def filterQueryOauthUser(tablequery:TableQuery[OauthUser], urlquery: Map[String, String]) = {
+    val dummyid: UUID = null
+    var returnquery = tablequery.filterNot(_.guid === dummyid)
     urlquery.foreach { querytuple =>
         querytuple._1 match{
-          case "applicationName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.name like (StringHelper.trim(querytuple._2) + "%").bind) 
+          case "oauthUserName" => if(!StringHelper.trim(querytuple._2).isEmpty()) returnquery = returnquery.filter(_.name like (StringHelper.trim(querytuple._2) + "%").bind) 
           case _ => 
         }
     }

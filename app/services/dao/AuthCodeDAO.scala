@@ -43,7 +43,7 @@ class AuthCodeDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends B
     findById(code)
   }
 
-  def findByCode(userGuid: UUID, clientId: Option[String]): Future[Option[AuthCodeRow]] = {
+  def findByGUID(userGuid: UUID, clientId: UUID): Future[Option[AuthCodeRow]] = {
     dbConfig.db.run(authcodequery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).result.headOption)
   }
 
@@ -59,7 +59,7 @@ class AuthCodeDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends B
   }
 
   
-  def deleteExistingAndCreate(authcode: AuthCodeRow, userGuid: UUID, clientId: Option[String]): Future[Int] = {
+  def deleteExistingAndCreate(authcode: AuthCodeRow, userGuid: UUID, clientId: UUID): Future[Int] = {
     val action =
     (for {
      _ <- authcodequery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).delete

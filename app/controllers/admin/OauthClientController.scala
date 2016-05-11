@@ -24,10 +24,11 @@ import utilities.auth.Role
 import utilities.auth.Role._
 import utilities._
 import java.util.Calendar
+import java.util.UUID
 
 
 
-class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, oauthClientDao: OauthClientDAO, appAccountDao: AppAccountDAO, oauthClientForm:OauthClientForm, oauthClientSearchForm:OauthClientSearchForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
+class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCheck, val userAccountService: UserAccountServiceLike, oauthClientDao: OauthClientDAO, oauthUserDao: OauthUserDAO, oauthClientForm:OauthClientForm, oauthClientSearchForm:OauthClientSearchForm, val messagesApi: MessagesApi) extends Controller with AuthActionBuilders with AuthConfigAdminImpl with I18nSupport  {
   val UserAccountSv = userAccountService
 
   val pageOffset = 5
@@ -43,14 +44,14 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
      oauthClientSearchForm.form.bindFromRequest.fold(
         formWithErrors => {
           Logger.debug(formWithErrors.toString())
-          appAccountDao.getValidListForSelectOption().map(options => 
+          oauthUserDao.getValidListForSelectOption().map(options => 
              BadRequest(views.html.oauthclient.listerror("エラー", formWithErrors, options))
           )
         },
         oauthclientsearch => {
          val pagenationOptions = for {
              (pagecount,oauthclient) <- oauthClientDao.paginglist(page, pageOffset, urlquery)
-             options <- appAccountDao.getValidListForSelectOption()
+             options <- oauthUserDao.getValidListForSelectOption()
           } yield ((pagecount,oauthclient), options)
     
           pagenationOptions.map{case ((pagecount,oauthclient), options) =>
@@ -63,10 +64,10 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
   }
   def add = addToken{
     AuthorizationAction(Administrator).async {implicit request =>
-      val appaccountOptions = for {
-         options <- appAccountDao.getValidListForSelectOption()
+      val oauthuserOptions = for {
+         options <- oauthUserDao.getValidListForSelectOption()
       } yield (options)
-      appaccountOptions.map { case (options) =>
+      oauthuserOptions.map { case (options) =>
          Ok(views.html.oauthclient.regist("", oauthClientForm.form, options))
       }
 
@@ -77,7 +78,7 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
     AuthorizationAction(Administrator).async { implicit request =>
       oauthClientForm.form.bindFromRequest.fold(
           formWithErrors => {
-           appAccountDao.getValidListForSelectOption().map(options => 
+           oauthUserDao.getValidListForSelectOption().map(options => 
                BadRequest(views.html.oauthclient.regist("エラー", formWithErrors, options))
             )
           },
@@ -94,8 +95,8 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
   def edit(oauthClientId: String) = addToken{
     AuthorizationAction(Administrator).async {implicit request =>
       val oauthclientOptions = for {
-         oauthclient <- oauthClientDao.findById(oauthClientId)
-         options <- appAccountDao.getValidListForSelectOption()
+         oauthclient <- oauthClientDao.findById(java.util.UUID.fromString(oauthClientId))
+         options <- oauthUserDao.getValidListForSelectOption()
       } yield (oauthclient, options)
       oauthclientOptions.map { case (oauthclient, options) =>
         oauthclient match {
@@ -113,7 +114,7 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
     AuthorizationAction(Administrator).async { implicit request =>
       oauthClientForm.form.bindFromRequest.fold(
           formWithErrors => {
-           appAccountDao.getValidListForSelectOption().map(options => 
+           oauthUserDao.getValidListForSelectOption().map(options => 
                BadRequest(views.html.oauthclient.edit("エラー2", formWithErrors, options))
             )
           },
@@ -121,7 +122,7 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
             oauthClientDao.update_mappinged(oauthclient).flatMap(cnt =>
               if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.OauthClientController.index(1)))
                else 
-                appAccountDao.getValidListForSelectOption().map(options => 
+                oauthUserDao.getValidListForSelectOption().map(options => 
                  BadRequest(views.html.oauthclient.edit("エラー3", oauthClientForm.form.fill(oauthclient), options))
                 )
             )
@@ -132,7 +133,7 @@ class OauthClientController @Inject()(addToken: CSRFAddToken, checkToken: CSRFCh
   
     def delete(id: String) = checkToken{
       AuthorizationAction(Administrator).async {implicit request =>
-        oauthClientDao.delete(id).flatMap(cnt =>
+        oauthClientDao.delete(java.util.UUID.fromString(id)).flatMap(cnt =>
           if (cnt != 0) Future.successful(Redirect(controllers.admin.routes.OauthClientController.index(1)))
           else Future.successful(Status(500)(views.html.errors.error500internalerror("error")))
         )

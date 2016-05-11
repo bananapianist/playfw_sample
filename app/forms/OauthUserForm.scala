@@ -7,24 +7,25 @@ import models.TablesExtend._
 import play.api.data.validation.Constraints._
 import play.api.i18n.{I18nSupport, MessagesApi, Messages, Lang}
 import javax.inject.Inject
+import java.util.UUID
 import utilities._
 
-class AppAccountForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
+class OauthUserForm @Inject()(val messagesApi: MessagesApi) extends I18nSupport{
     val form = Form(
     mapping(
-      "id" -> optional(longNumber),
+      "guid" -> optional(uuid),
       "name" -> text.verifying(Messages("error.required", "名前"), {!_.isEmpty})
                             .verifying(Messages("error.maxLength", 10),{_.length <= 50 })
                             .verifying(Messages("error.minLength", 4),{_.length >=4})
       )
-      (appaccountapply)(appaccountunapply)
+      (oauthuserapply)(oauthuserunapply)
   )
-  private def appaccountapply(
-      id: Option[Long],
+  private def oauthuserapply(
+      guid: Option[UUID],
       name: String
-       ) = new AppAccountRow(id.getOrElse(0), name, new Date)
-  private def appaccountunapply(n: AppAccountRow) = Some(
-      (Option(n.id), n.name)
+       ) = new OauthUserRow(guid.getOrElse(null), name, new Date)
+  private def oauthuserunapply(n: OauthUserRow) = Some(
+      (Option(n.guid), n.name)
       )
 
 }

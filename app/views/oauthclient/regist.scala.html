@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.TablesExtend.OauthClientRow], applicationList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
+@(message: String, form1: Form[models.TablesExtend.OauthClientRow], oauthUserList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
 
 @import helper._
 @import play.api.i18n.Messages
@@ -21,7 +21,7 @@
 
     @b4.form(action=admin.routes.OauthClientController.create) {
     	@CSRF.formField
-		@views.html.oauthclient.form(form1, applicationList)
+		@views.html.oauthclient.form(form1, oauthUserList)
 		@b4.submit('class -> "btn btn-primary"){登録}
 
     }

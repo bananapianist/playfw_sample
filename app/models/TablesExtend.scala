@@ -25,7 +25,7 @@ trait TablesExtend {
   )
   
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(AccessToken.schema, Account.schema, AppAccount.schema, AuthCode.schema, Bill.schema, Contract.schema, Customer.schema, OauthClient.schema, PlayEvolutions.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(AccessToken.schema, Account.schema, AuthCode.schema, Bill.schema, Contract.schema, Customer.schema, OauthClient.schema, OauthUser.schema, PlayEvolutions.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -33,22 +33,22 @@ trait TablesExtend {
    *  @param accessToken Database column access_token SqlType(VARCHAR), PrimaryKey, Length(255,true)
    *  @param refreshToken Database column refresh_token SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param userGuid Database column user_guid SqlType(BINARY)
+   *  @param oauthClientId Database column oauth_client_id SqlType(BINARY)
    *  @param redirectUri Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param scope Database column scope SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param oauthClientId Database column oauth_client_id SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param expiresIn Database column expires_in SqlType(INT)
    *  @param createdDate Database column created_date SqlType(DATETIME) */
-  case class AccessTokenRow(accessToken: String, refreshToken: Option[String] = None, userGuid: UUID, redirectUri: Option[String] = None, scope: Option[String] = None, oauthClientId: Option[String] = None, expiresIn: Int, createdDate: Date)
+  case class AccessTokenRow(accessToken: String, refreshToken: Option[String] = None, userGuid: UUID, oauthClientId: UUID, redirectUri: Option[String] = None, scope: Option[String] = None, expiresIn: Int, createdDate: Date)
   /** GetResult implicit for fetching AccessTokenRow objects using plain SQL queries */
   implicit def GetResultAccessTokenRow(implicit e0: GR[String], e1: GR[Option[String]], e2: GR[UUID], e3: GR[Int], e4: GR[Date]): GR[AccessTokenRow] = GR{
     prs => import prs._
-    AccessTokenRow.tupled((<<[String], <<?[String], <<[UUID], <<?[String], <<?[String], <<?[String], <<[Int], <<[Date]))
+    AccessTokenRow.tupled((<<[String], <<?[String], <<[UUID], <<[UUID], <<?[String], <<?[String], <<[Int], <<[Date]))
   }
   /** Table description of table access_token. Objects of this class serve as prototypes for rows in queries. */
   class AccessToken(_tableTag: Tag) extends Table[AccessTokenRow](_tableTag, "access_token") {
-    def * = (accessToken, refreshToken, userGuid, redirectUri, scope, oauthClientId, expiresIn, createdDate) <> (AccessTokenRow.tupled, AccessTokenRow.unapply)
+    def * = (accessToken, refreshToken, userGuid, oauthClientId, redirectUri, scope, expiresIn, createdDate) <> (AccessTokenRow.tupled, AccessTokenRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(accessToken), refreshToken, Rep.Some(userGuid), redirectUri, scope, oauthClientId, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> AccessTokenRow.tupled((_1.get, _2, _3.get, _4, _5, _6, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(accessToken), refreshToken, Rep.Some(userGuid), Rep.Some(oauthClientId), redirectUri, scope, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> AccessTokenRow.tupled((_1.get, _2, _3.get, _4.get, _5, _6, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column access_token SqlType(VARCHAR), PrimaryKey, Length(255,true) */
     val accessToken: Rep[String] = column[String]("access_token", O.PrimaryKey, O.Length(255,varying=true))
@@ -56,12 +56,12 @@ trait TablesExtend {
     val refreshToken: Rep[Option[String]] = column[Option[String]]("refresh_token", O.Length(255,varying=true), O.Default(None))
     /** Database column user_guid SqlType(BINARY) */
     val userGuid: Rep[UUID] = column[UUID]("user_guid")
+    /** Database column oauth_client_id SqlType(BINARY) */
+    val oauthClientId: Rep[UUID] = column[UUID]("oauth_client_id")
     /** Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None) */
     val redirectUri: Rep[Option[String]] = column[Option[String]]("redirect_uri", O.Length(255,varying=true), O.Default(None))
     /** Database column scope SqlType(VARCHAR), Length(255,true), Default(None) */
     val scope: Rep[Option[String]] = column[Option[String]]("scope", O.Length(255,varying=true), O.Default(None))
-    /** Database column oauth_client_id SqlType(VARCHAR), Length(255,true), Default(None) */
-    val oauthClientId: Rep[Option[String]] = column[Option[String]]("oauth_client_id", O.Length(255,varying=true), O.Default(None))
     /** Database column expires_in SqlType(INT) */
     val expiresIn: Rep[Int] = column[Int]("expires_in")
     /** Database column created_date SqlType(DATETIME) */
@@ -105,62 +105,36 @@ trait TablesExtend {
   /** Collection-like TableQuery object for table Account */
   lazy val Account = new TableQuery(tag => new Account(tag))
 
-  /** Entity class storing rows of table AppAccount
-   *  @param id Database column id SqlType(BIGINT), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
-   *  @param createdDate Database column created_date SqlType(DATETIME) */
-  case class AppAccountRow(id: Long, name: String, createdDate: Date)
-  /** GetResult implicit for fetching AppAccountRow objects using plain SQL queries */
-  implicit def GetResultAppAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Date]): GR[AppAccountRow] = GR{
-    prs => import prs._
-    AppAccountRow.tupled((<<[Long], <<[String], <<[Date]))
-  }
-  /** Table description of table app_account. Objects of this class serve as prototypes for rows in queries. */
-  class AppAccount(_tableTag: Tag) extends Table[AppAccountRow](_tableTag, "app_account") {
-    def * = (id, name, createdDate) <> (AppAccountRow.tupled, AppAccountRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> AppAccountRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(BIGINT), AutoInc, PrimaryKey */
-    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(255,true) */
-    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
-    /** Database column created_date SqlType(DATETIME) */
-    val createdDate: Rep[Date] = column[Date]("created_date")
-  }
-  /** Collection-like TableQuery object for table AppAccount */
-  lazy val AppAccount = new TableQuery(tag => new AppAccount(tag))
-
   /** Entity class storing rows of table AuthCode
    *  @param authorizationCode Database column authorization_code SqlType(VARCHAR), PrimaryKey, Length(255,true)
    *  @param userGuid Database column user_guid SqlType(BINARY)
+   *  @param oauthClientId Database column oauth_client_id SqlType(BINARY)
    *  @param redirectUri Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param scope Database column scope SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param oauthClientId Database column oauth_client_id SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param expiresIn Database column expires_in SqlType(INT)
    *  @param createdDate Database column created_date SqlType(DATETIME) */
-  case class AuthCodeRow(authorizationCode: String, userGuid: UUID, redirectUri: Option[String] = None, scope: Option[String] = None, oauthClientId: Option[String] = None, expiresIn: Int, createdDate: Date)
+  case class AuthCodeRow(authorizationCode: String, userGuid: UUID, oauthClientId: UUID, redirectUri: Option[String] = None, scope: Option[String] = None, expiresIn: Int, createdDate: Date)
   /** GetResult implicit for fetching AuthCodeRow objects using plain SQL queries */
   implicit def GetResultAuthCodeRow(implicit e0: GR[String], e1: GR[UUID], e2: GR[Option[String]], e3: GR[Int], e4: GR[Date]): GR[AuthCodeRow] = GR{
     prs => import prs._
-    AuthCodeRow.tupled((<<[String], <<[UUID], <<?[String], <<?[String], <<?[String], <<[Int], <<[Date]))
+    AuthCodeRow.tupled((<<[String], <<[UUID], <<[UUID], <<?[String], <<?[String], <<[Int], <<[Date]))
   }
   /** Table description of table auth_code. Objects of this class serve as prototypes for rows in queries. */
   class AuthCode(_tableTag: Tag) extends Table[AuthCodeRow](_tableTag, "auth_code") {
-    def * = (authorizationCode, userGuid, redirectUri, scope, oauthClientId, expiresIn, createdDate) <> (AuthCodeRow.tupled, AuthCodeRow.unapply)
+    def * = (authorizationCode, userGuid, oauthClientId, redirectUri, scope, expiresIn, createdDate) <> (AuthCodeRow.tupled, AuthCodeRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(authorizationCode), Rep.Some(userGuid), redirectUri, scope, oauthClientId, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> AuthCodeRow.tupled((_1.get, _2.get, _3, _4, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(authorizationCode), Rep.Some(userGuid), Rep.Some(oauthClientId), redirectUri, scope, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> AuthCodeRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column authorization_code SqlType(VARCHAR), PrimaryKey, Length(255,true) */
     val authorizationCode: Rep[String] = column[String]("authorization_code", O.PrimaryKey, O.Length(255,varying=true))
     /** Database column user_guid SqlType(BINARY) */
     val userGuid: Rep[UUID] = column[UUID]("user_guid")
+    /** Database column oauth_client_id SqlType(BINARY) */
+    val oauthClientId: Rep[UUID] = column[UUID]("oauth_client_id")
     /** Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None) */
     val redirectUri: Rep[Option[String]] = column[Option[String]]("redirect_uri", O.Length(255,varying=true), O.Default(None))
     /** Database column scope SqlType(VARCHAR), Length(255,true), Default(None) */
     val scope: Rep[Option[String]] = column[Option[String]]("scope", O.Length(255,varying=true), O.Default(None))
-    /** Database column oauth_client_id SqlType(VARCHAR), Length(255,true), Default(None) */
-    val oauthClientId: Rep[Option[String]] = column[Option[String]]("oauth_client_id", O.Length(255,varying=true), O.Default(None))
     /** Database column expires_in SqlType(INT) */
     val expiresIn: Rep[Int] = column[Int]("expires_in")
     /** Database column created_date SqlType(DATETIME) */
@@ -314,29 +288,29 @@ trait TablesExtend {
   lazy val Customer = new TableQuery(tag => new Customer(tag))
 
   /** Entity class storing rows of table OauthClient
-   *  @param oauthClientId Database column oauth_client_id SqlType(VARCHAR), PrimaryKey, Length(255,true)
-   *  @param applicationId Database column application_id SqlType(BIGINT)
+   *  @param oauthClientId Database column oauth_client_id SqlType(BINARY), PrimaryKey
+   *  @param oauthUserId Database column oauth_user_id SqlType(BINARY)
    *  @param clientSecret Database column client_secret SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param redirectUri Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param grantType Database column grant_type SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param expiresIn Database column expires_in SqlType(INT)
    *  @param createdDate Database column created_date SqlType(DATETIME) */
-  case class OauthClientRow(oauthClientId: String, applicationId: Long, clientSecret: Option[String] = None, redirectUri: Option[String] = None, grantType: Option[String] = None, expiresIn: Int, createdDate: Date)
+  case class OauthClientRow(oauthClientId: UUID, oauthUserId: UUID, clientSecret: Option[String] = None, redirectUri: Option[String] = None, grantType: Option[String] = None, expiresIn: Int, createdDate: Date)
   /** GetResult implicit for fetching OauthClientRow objects using plain SQL queries */
-  implicit def GetResultOauthClientRow(implicit e0: GR[String], e1: GR[Long], e2: GR[Option[String]], e3: GR[Int], e4: GR[Date]): GR[OauthClientRow] = GR{
+  implicit def GetResultOauthClientRow(implicit e0: GR[UUID], e1: GR[Option[String]], e2: GR[Int], e3: GR[Date]): GR[OauthClientRow] = GR{
     prs => import prs._
-    OauthClientRow.tupled((<<[String], <<[Long], <<?[String], <<?[String], <<?[String], <<[Int], <<[Date]))
+    OauthClientRow.tupled((<<[UUID], <<[UUID], <<?[String], <<?[String], <<?[String], <<[Int], <<[Date]))
   }
   /** Table description of table oauth_client. Objects of this class serve as prototypes for rows in queries. */
   class OauthClient(_tableTag: Tag) extends Table[OauthClientRow](_tableTag, "oauth_client") {
-    def * = (oauthClientId, applicationId, clientSecret, redirectUri, grantType, expiresIn, createdDate) <> (OauthClientRow.tupled, OauthClientRow.unapply)
+    def * = (oauthClientId, oauthUserId, clientSecret, redirectUri, grantType, expiresIn, createdDate) <> (OauthClientRow.tupled, OauthClientRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(oauthClientId), Rep.Some(applicationId), clientSecret, redirectUri, grantType, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> OauthClientRow.tupled((_1.get, _2.get, _3, _4, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(oauthClientId), Rep.Some(oauthUserId), clientSecret, redirectUri, grantType, Rep.Some(expiresIn), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> OauthClientRow.tupled((_1.get, _2.get, _3, _4, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column oauth_client_id SqlType(VARCHAR), PrimaryKey, Length(255,true) */
-    val oauthClientId: Rep[String] = column[String]("oauth_client_id", O.PrimaryKey, O.Length(255,varying=true))
-    /** Database column application_id SqlType(BIGINT) */
-    val applicationId: Rep[Long] = column[Long]("application_id")
+    /** Database column oauth_client_id SqlType(BINARY), PrimaryKey */
+    val oauthClientId: Rep[UUID] = column[UUID]("oauth_client_id", O.PrimaryKey)
+    /** Database column oauth_user_id SqlType(BINARY) */
+    val oauthUserId: Rep[UUID] = column[UUID]("oauth_user_id")
     /** Database column client_secret SqlType(VARCHAR), Length(255,true), Default(None) */
     val clientSecret: Rep[Option[String]] = column[Option[String]]("client_secret", O.Length(255,varying=true), O.Default(None))
     /** Database column redirect_uri SqlType(VARCHAR), Length(255,true), Default(None) */
@@ -352,9 +326,34 @@ trait TablesExtend {
   lazy val OauthClient = new TableQuery(tag => new OauthClient(tag))
 
   
-  case class OauthClientSearchRow(applicationId: Option[Long] = None, applicationName: Option[String] = None)
+  case class OauthClientSearchRow(oauthUserId: Option[String] = None, oauthUserName: Option[String] = None)
 
-    
+  /** Entity class storing rows of table OauthUser
+   *  @param guid Database column guid SqlType(BINARY), PrimaryKey
+   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
+   *  @param createdDate Database column created_date SqlType(DATETIME) */
+  case class OauthUserRow(guid: UUID, name: String, createdDate: Date)
+  /** GetResult implicit for fetching OauthUserRow objects using plain SQL queries */
+  implicit def GetResultOauthUserRow(implicit e0: GR[UUID], e1: GR[String], e2: GR[Date]): GR[OauthUserRow] = GR{
+    prs => import prs._
+    OauthUserRow.tupled((<<[UUID], <<[String], <<[Date]))
+  }
+  /** Table description of table oauth_user. Objects of this class serve as prototypes for rows in queries. */
+  class OauthUser(_tableTag: Tag) extends Table[OauthUserRow](_tableTag, "oauth_user") {
+    def * = (guid, name, createdDate) <> (OauthUserRow.tupled, OauthUserRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(guid), Rep.Some(name), Rep.Some(createdDate)).shaped.<>({r=>import r._; _1.map(_=> OauthUserRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column guid SqlType(BINARY), PrimaryKey */
+    val guid: Rep[UUID] = column[UUID]("guid", O.PrimaryKey)
+    /** Database column name SqlType(VARCHAR), Length(255,true) */
+    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
+    /** Database column created_date SqlType(DATETIME) */
+    val createdDate: Rep[Date] = column[Date]("created_date")
+  }
+  /** Collection-like TableQuery object for table OauthUser */
+  lazy val OauthUser = new TableQuery(tag => new OauthUser(tag))
+
   /** Entity class storing rows of table PlayEvolutions
    *  @param id Database column id SqlType(INT), PrimaryKey
    *  @param hash Database column hash SqlType(VARCHAR), Length(255,true)

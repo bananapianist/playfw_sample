@@ -1,12 +1,12 @@
-# create_app_account
+# create_oauth_user
 
 # --- !Ups
-CREATE TABLE app_account (
-    id         bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE oauth_user (
+    guid         binary(16) NOT NULL PRIMARY KEY,
     name       varchar(255) NOT NULL,
    	created_date datetime NOT NULL
 );
 
 # --- !Downs
-DROP TABLE app_account;
+DROP TABLE oauth_user;
 

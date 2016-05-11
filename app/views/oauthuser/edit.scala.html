@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.TablesExtend.AppAccountRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, form1: Form[models.TablesExtend.OauthUserRow])(implicit messages: Messages,request: RequestHeader)
 @import helper._
 @implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-4") }
 
@@ -12,15 +12,15 @@
                     </div>
     <p>@message</p>
 
-    @b4.form(action=admin.routes.AppAccountController.update) {
-         <input type="hidden" name="id" value="@form1("id").value">
+    @b4.form(action=admin.routes.OauthUserController.update) {
+         <input type="hidden" name="guid" value="@form1("guid").value">
         @CSRF.formField
-		@views.html.appaccount.form(form1)
+		@views.html.oauthuser.form(form1)
 		@b4.submit('class -> "btn btn-primary"){更新}
     }
 
     </div>
-    <p><a href="@admin.routes.AppAccountController.index" class="btn btn-link">一覧</a></p>
+    <p><a href="@admin.routes.OauthUserController.index" class="btn btn-link">一覧</a></p>
     </div>
     </div>
 

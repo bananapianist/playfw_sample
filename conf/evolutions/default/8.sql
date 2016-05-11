@@ -2,8 +2,8 @@
 
 # --- !Ups
 CREATE TABLE oauth_client (
-    oauth_client_id varchar(255) NOT NULL ,
-    application_id bigint(20) NOT NULL ,
+    oauth_client_id binary(16) NOT NULL ,
+    oauth_user_id binary(16) NOT NULL ,
     client_secret varchar(255),
     redirect_uri varchar(255),
     grant_type varchar(255),

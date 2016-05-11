@@ -1,4 +1,4 @@
-@(message: String, form1: Form[models.TablesExtend.AppAccountRow])(implicit messages: Messages,request: RequestHeader)
+@(message: String, form1: Form[models.TablesExtend.OauthUserRow])(implicit messages: Messages,request: RequestHeader)
 
 @import helper._
 @import play.api.i18n.Messages
@@ -19,15 +19,15 @@
                     </div>
     <p>@message</p>
 
-    @b4.form(action=admin.routes.AppAccountController.create) {
+    @b4.form(action=admin.routes.OauthUserController.create) {
     	@CSRF.formField
-		@views.html.appaccount.form(form1)
+		@views.html.oauthuser.form(form1)
 		@b4.submit('class -> "btn btn-primary"){登録}
 
     }
 
     </div>
-    <p><a href="@admin.routes.AppAccountController.index" class="btn btn-link">一覧</a></p>
+    <p><a href="@admin.routes.OauthUserController.index" class="btn btn-link">一覧</a></p>
     </div>
     </div>
  

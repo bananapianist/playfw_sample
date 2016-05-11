@@ -47,7 +47,7 @@ class AccessTokenDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(accesstokenquery.filter(_.refreshToken === token).result.headOption)
   }
 
-  def findByToken(userGuid: UUID, clientId: Option[String]): Future[Option[AccessTokenRow]] = {
+  def findByToken(userGuid: UUID, clientId: UUID): Future[Option[AccessTokenRow]] = {
     dbConfig.db.run(accesstokenquery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).result.headOption)
   }
 
@@ -63,14 +63,16 @@ class AccessTokenDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
   }
 
   
-  def deleteExistingAndCreate(accessToken: AccessTokenRow, userGuid: UUID, clientId: Option[String]): Future[Int] = {
+  def deleteExistingAndCreate(accessToken: AccessTokenRow, userGuid: UUID, clientId: UUID): Future[Int] = {
     val action =
     (for {
      _ <- accesstokenquery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).delete
      newId <- accesstokenquery += accessToken
-  } yield (newId) )
+    } yield (newId) )
 
-   dbConfig.db.run(action.transactionally)
+    dbConfig.db.run(action.transactionally)
   }
+  
+
 }
 
