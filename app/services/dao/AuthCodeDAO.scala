@@ -23,9 +23,7 @@ import java.util.UUID
 class AuthCodeDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[AuthCodeRow, String]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val authcodequery = TableQuery[AuthCode]
- 
-
-  
+  private val oauthuserquery = TableQuery[OauthUser]
 
   def all(): Future[List[AuthCodeRow]] = {
     dbConfig.db.run(authcodequery.sortBy(c => c.authorizationCode.desc).result).map(_.toList)
@@ -59,7 +57,9 @@ class AuthCodeDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends B
   }
 
   
-  def deleteExistingAndCreate(authcode: AuthCodeRow, userGuid: UUID, clientId: UUID): Future[Int] = {
+ def delete(code: String): Future[Int] = dbConfig.db.run(authcodequery.filter(_.authorizationCode === code).delete)
+
+ def deleteExistingAndCreate(authcode: AuthCodeRow, userGuid: UUID, clientId: UUID): Future[Int] = {
     val action =
     (for {
      _ <- authcodequery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).delete
@@ -67,6 +67,15 @@ class AuthCodeDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends B
   } yield (newId) )
 
    dbConfig.db.run(action.transactionally)
+  }
+ 
+  def getWithOauthUserByCode(code: String): Future[Option[(AuthCodeRow, OauthUserRow)]] ={
+    var joinquery = (for{
+      tokenlist <- authcodequery.filter(_.authorizationCode === code) join oauthuserquery on (_.userGuid === _.guid) 
+    }yield (tokenlist)
+    ).result.headOption
+    dbConfig.db.run(joinquery.transactionally)
+    
   }
 }
 

@@ -23,6 +23,7 @@ import java.util.UUID
 class AccessTokenDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[AccessTokenRow, String]{
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   private val accesstokenquery = TableQuery[AccessToken]
+  private val oauthuserquery = TableQuery[OauthUser]
  
 
   
@@ -48,7 +49,7 @@ class AccessTokenDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
   }
 
   def findByToken(userGuid: UUID, clientId: UUID): Future[Option[AccessTokenRow]] = {
-    dbConfig.db.run(accesstokenquery.filter(a => a.oauthClientId === clientId && a.userGuid === userGuid).result.headOption)
+    dbConfig.db.run(accesstokenquery.filter(a => a.userGuid === userGuid && a.oauthClientId === clientId).result.headOption)
   }
 
   def create(account: AccessTokenRow): Future[Int] = {
@@ -73,6 +74,22 @@ class AccessTokenDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(action.transactionally)
   }
   
+  def getWithOauthUserByRefreshToken(refreshToken: String): Future[Option[(AccessTokenRow, OauthUserRow)]] ={
+    var joinquery = (for{
+      tokenlist <- accesstokenquery.filter(_.refreshToken === refreshToken) join oauthuserquery on (_.userGuid === _.guid) 
+    }yield (tokenlist)
+    ).result.headOption
+    dbConfig.db.run(joinquery.transactionally)
+    
+  }
 
+  def getWithOauthUserByAccessToken(accessToken: String): Future[Option[(AccessTokenRow, OauthUserRow)]] ={
+    var joinquery = (for{
+      tokenlist <- accesstokenquery.filter(_.accessToken === accessToken) join oauthuserquery on (_.userGuid === _.guid) 
+    }yield (tokenlist)
+    ).result.headOption
+    dbConfig.db.run(joinquery.transactionally)
+    
+  }
 }
 

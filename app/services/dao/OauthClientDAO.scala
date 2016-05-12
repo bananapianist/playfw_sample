@@ -62,8 +62,9 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === id).result.headOption)
   }
 
-  def findByClientCredentials(clientId: UUID, clientSecret: String): Future[Option[OauthClientRow]] = {
-    dbConfig.db.run(oauthclientquery.filter(n => (n.oauthClientId === clientId) && (n.clientSecret === clientSecret) && (n.grantType === GrantType.ClientCredentialsGrantType)).result.headOption)
+  def findByClientCredentialsReturnOauthUser(clientId: UUID, clientSecret: String): Future[Option[OauthUserRow]] = {
+    val subquery = oauthclientquery.filter(n => (n.oauthClientId === clientId) && (n.clientSecret === clientSecret) && (n.grantType === GrantType.ClientCredentialsGrantType))
+    dbConfig.db.run(oauthuserquery.filter(_.guid in subquery.map(_.oauthUserId)).result.headOption)
   }
 
   def create(oauthclient: OauthClientRow): Future[Int] = {
