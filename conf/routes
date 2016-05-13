@@ -86,8 +86,10 @@ GET     /oauthclient/pagenation/:page                    @controllers.admin.Oaut
 # OauthAPI
 POST    /oauth/access_token                  @controllers.oauth.OAuthController.accessToken
 GET     /oauth/resources                  @controllers.oauth.OAuthController.resources
-GET     /oauth/show                  @controllers.oauth.OAuthController.show
 
+# CustomerAPI
+POST     /api/customer/list                  @controllers.api.CostomerApiController.getlist
+GET     /api/customer/list_sub                  @controllers.api.CostomerApiController.getlistsub
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
