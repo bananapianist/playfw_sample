@@ -35,7 +35,7 @@
 	                <td>@oauthclient.oauthClientId.toString</td>
 	                <td>@oauthclient.clientSecret</td>
 	                <td>@oauthuser.name</td>
-	                <td>@oauthclient.grantType</td>
+	                <td>@utilities.ViewHelper.getOptionView(oauthclient.grantType.getOrElse("-1").toString,utilities.ViewHelper.makeOptionMap(utilities.oauth.GrantType.typeSeq, "view.oauthclient.granttype", messages))</td>
 	        <td><a href="@admin.routes.OauthClientController.edit(oauthclient.oauthClientId.toString)" class="btn btn-link">編集</a></td>
 	        <td>@b4.form(action=admin.routes.OauthClientController.delete(oauthclient.oauthClientId.toString)) {
 	        	@CSRF.formField 
