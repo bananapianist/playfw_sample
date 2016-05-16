@@ -21,7 +21,7 @@ import slick.driver.MySQLDriver.api._
 import java.util.UUID
 
 import utilities._
-import utilities.oauth.GrantType
+
 
 
 class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extends BaseDAO[OauthClientRow, UUID]{
@@ -62,8 +62,8 @@ class OauthClientDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)  extend
     dbConfig.db.run(oauthclientquery.filter(_.oauthClientId === id).result.headOption)
   }
 
-  def findByClientCredentialsReturnOauthUser(clientId: UUID, clientSecret: String): Future[Option[OauthUserRow]] = {
-    val subquery = oauthclientquery.filter(n => (n.oauthClientId === clientId) && (n.clientSecret === clientSecret) && (n.grantType === GrantType.ClientCredentialsGrantType))
+  def findByClientCredentialsReturnOauthUser(clientId: UUID, clientSecret: String, grandType: String): Future[Option[OauthUserRow]] = {
+    val subquery = oauthclientquery.filter(n => (n.oauthClientId === clientId) && (n.clientSecret === clientSecret) && (n.grantType === grandType))
     dbConfig.db.run(oauthuserquery.filter(_.guid in subquery.map(_.oauthUserId)).result.headOption)
   }
 

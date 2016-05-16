@@ -11,6 +11,7 @@ import scalaoauth2.provider.OAuth2ProviderActionBuilders._
 
 import services.dao._
 import models.TablesExtend._
+import utilities.oauth.GrantType
 
 import java.util.Date
 import org.mindrot.jbcrypt.BCrypt
@@ -39,15 +40,34 @@ class Oauth2DataHandler @Inject()(oauthClientDAO: OauthClientDAO, oauthUserDAO: 
      
    }
 
+  def getStoredAuthCode(authInfo: AuthInfo[OauthUserRow]): Future[Option[Oauth2DataHandlerObj.AuthorizationCode]] = {
+   authCodeDAO.findByGUID(authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse(""))).map { optCode =>
+      optCode.map { code =>
+        Oauth2DataHandlerObj.AuthorizationCode(code.authorizationCode, code.scope, Option(code.expiresIn.toLong), code.createdDate)
+      }
+    }
+     
+   }
+
   override def createAccessToken(authInfo: AuthInfo[OauthUserRow]): Future[scalaoauth2.provider.AccessToken] = {
     val accessTokenExpiresIn =  60L * 60L
     val refreshToken = Some(Crypto.generateToken)
     val accessToken = Crypto.generateToken
     val now = new Date
     
-    val tokenObject = new AccessTokenRow(accessToken, refreshToken, authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse("")), Option(""), authInfo.scope, accessTokenExpiresIn.toInt, new Date)
+    val tokenObject = new AccessTokenRow(accessToken, refreshToken, authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse("")), authInfo.redirectUri, authInfo.scope, accessTokenExpiresIn.toInt, new Date)
     accessTokenDAO.deleteExistingAndCreate(tokenObject, authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse("")))
     Future.successful(scalaoauth2.provider.AccessToken(accessToken, refreshToken, authInfo.scope, Option(accessTokenExpiresIn), now))
+   }
+
+  def createAuthCode(authInfo: AuthInfo[OauthUserRow]): Future[Oauth2DataHandlerObj.AuthorizationCode] = {
+    val AuthCodeExpiresIn =  60L * 60L
+    val authorizationCode = Crypto.generateToken
+    val now = new Date
+    
+    val codeObject = new AuthCodeRow(authorizationCode, authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse("")), authInfo.redirectUri, authInfo.scope, AuthCodeExpiresIn.toInt, new Date)
+    authCodeDAO.deleteExistingAndCreate(codeObject, authInfo.user.guid, java.util.UUID.fromString(authInfo.clientId.getOrElse("")))
+    Future.successful(Oauth2DataHandlerObj.AuthorizationCode(authorizationCode, authInfo.scope, Option(AuthCodeExpiresIn), now))
    }
 
   override def findUser(request: AuthorizationRequest): Future[Option[OauthUserRow]] = {
@@ -59,7 +79,16 @@ class Oauth2DataHandler @Inject()(oauthClientDAO: OauthClientDAO, oauthUserDAO: 
           request.clientCredential.map { clientCredential =>
             oauthClientDAO.findByClientCredentialsReturnOauthUser(
               java.util.UUID.fromString(clientCredential.clientId),
-              clientCredential.clientSecret.getOrElse("")
+              clientCredential.clientSecret.getOrElse(""),
+              GrantType.ClientCredentialsGrantType
+            )
+          }.getOrElse(Future.successful(None))
+        case request: AuthorizationCodeRequest =>
+          request.clientCredential.map { clientCredential =>
+            oauthClientDAO.findByClientCredentialsReturnOauthUser(
+              java.util.UUID.fromString(clientCredential.clientId),
+              clientCredential.clientSecret.getOrElse(""),
+              GrantType.AuthorizationCodeGrantType
             )
           }.getOrElse(Future.successful(None))
         case _ =>
@@ -81,6 +110,10 @@ class Oauth2DataHandler @Inject()(oauthClientDAO: OauthClientDAO, oauthUserDAO: 
 
   override def refreshAccessToken(authInfo: AuthInfo[OauthUserRow], refreshToken: String): Future[scalaoauth2.provider.AccessToken] = {
      createAccessToken(authInfo)
+   }
+
+  def refreshAuthCode(authInfo: AuthInfo[OauthUserRow]): Future[Oauth2DataHandlerObj.AuthorizationCode] = {
+     createAuthCode(authInfo)
    }
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[OauthUserRow]]] = {
@@ -119,7 +152,21 @@ class Oauth2DataHandler @Inject()(oauthClientDAO: OauthClientDAO, oauthUserDAO: 
       }
     }
    }
-
+}
+object Oauth2DataHandlerObj {
+  case class AuthorizationCode(code: String, scope: Option[String], lifeSeconds: Option[Long], createdAt: Date) {
+    def isExpired: Boolean = expirationTimeInMilis.exists { expTime =>
+      expTime <= System.currentTimeMillis
+    }
+  
+    def expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
+      (expTime - System.currentTimeMillis) / 1000
+    }
+  
+    private def expirationTimeInMilis: Option[Long] = lifeSeconds map { lifeSecs =>
+      createdAt.getTime + lifeSecs * 1000
+    }
+  }
 
 }
 

@@ -85,6 +85,7 @@ GET     /oauthclient/pagenation/:page                    @controllers.admin.Oaut
 
 # OauthAPI
 POST    /oauth/access_token                  @controllers.oauth.OAuthController.accessToken
+POST    /oauth/auth_code                  @controllers.oauth.OAuthController.authcode
 GET     /oauth/resources                  @controllers.oauth.OAuthController.resources
 
 # CustomerAPI

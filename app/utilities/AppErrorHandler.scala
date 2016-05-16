@@ -22,7 +22,9 @@ class AppErrorHandler extends HttpErrorHandler {
 
   def onServerError(request: RequestHeader, exception: Throwable) = {
     Logger.debug("server error")
+    Logger.debug(request.toString())
     Logger.debug(exception.getMessage)
+    Logger.debug(exception.toString())
     Future.successful(
       InternalServerError("A server error occurred: " + exception.getMessage)
     )
