@@ -63,6 +63,34 @@ POST    /contract/remove/:id                     @controllers.admin.ContractCont
 GET     /contract/:page                          @controllers.admin.ContractController.index(page: Integer)
 GET     /contract/pagenation/:page                    @controllers.admin.ContractController.pagenation(page: Int, pagename: String)
 
+# OauthUser
+GET     /oauthuser                          @controllers.admin.OauthUserController.index
+GET     /oauthuser/regist                           @controllers.admin.OauthUserController.add
+GET     /oauthuser/edit/:id                           @controllers.admin.OauthUserController.edit(id : String)
+POST    /oauthuser/create                     @controllers.admin.OauthUserController.create
+POST    /oauthuser/update                     @controllers.admin.OauthUserController.update
+POST    /oauthuser/remove/:id                     @controllers.admin.OauthUserController.delete(id : String)
+GET     /oauthuser/nameautocomplete                           @controllers.admin.OauthUserController.nameautocomplete(name: String)
+
+# OauthClient
+GET     /oauthclient                          @controllers.admin.OauthClientController.index(page: Integer = 1)
+GET     /oauthclient/regist                           @controllers.admin.OauthClientController.add
+GET     /oauthclient/edit/:id                           @controllers.admin.OauthClientController.edit(id : String)
+POST    /oauthclient/create                     @controllers.admin.OauthClientController.create
+POST    /oauthclient/update                     @controllers.admin.OauthClientController.update
+POST    /oauthclient/remove/:id                     @controllers.admin.OauthClientController.delete(id : String)
+# ※ページ設定はグループ最後に記述しないとおかしな動きになる
+GET     /oauthclient/:page                          @controllers.admin.OauthClientController.index(page: Integer)
+GET     /oauthclient/pagenation/:page                    @controllers.admin.OauthClientController.pagenation(page: Int, pagename: String)
+
+# OauthAPI
+POST    /oauth/access_token                  @controllers.oauth.OAuthController.accessToken
+POST    /oauth/auth_code                  @controllers.oauth.OAuthController.authcode
+GET     /oauth/resources                  @controllers.oauth.OAuthController.resources
+
+# CustomerAPI
+POST     /api/customer/list                  @controllers.api.CostomerApiController.getlist
+GET     /api/customer/list_sub                  @controllers.api.CostomerApiController.getlistsub
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

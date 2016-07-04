@@ -1,0 +1,8 @@
+@(formaccount: Form[models.TablesExtend.OauthUserRow])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-10") }
+
+	@b4.text( formaccount("name"), '_label -> "名前", 'placeholder -> "山田太郎" )
+ 

@@ -1,0 +1,26 @@
+@(message: String, formoauthclientsearch: Form[models.TablesExtend.OauthClientSearchRow], oauthUserList: Seq[(String, String)])(implicit messages: Messages,request: RequestHeader)
+@import helper._
+@implicitFC = @{ b4.vertical.fieldConstructor }
+	
+
+@main("一覧画面") {
+        <h1>一覧画面</h1>
+      <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+    @b4.form(action=admin.routes.OauthClientController.index(1)) {
+		@views.html.oauthclient.searchform(formoauthclientsearch,oauthUserList)
+		<div class="col-md-10">
+		@b4.submit('class -> "btn btn-primary"){検索}
+		</div>
+        @CSRF.formField
+    }
+    </div>
+    </div>
+         <div class="text-center">
+    <div class="text-center">
+         <p><a href="@admin.routes.OauthClientController.add" class="btn btn-success">新規登録</a></p>
+        </div>
+    </div>
+
+
+}

@@ -1,0 +1,20 @@
+@(formoauthclient: Form[models.TablesExtend.OauthClientRow], oauthUserList: Seq[(String, String)])(implicit messages: Messages)
+
+@import helper._
+@import play.api.i18n.Messages
+@implicitFC = @{ b4.horizontal.fieldConstructor("col-md-2", "col-md-10") }
+
+	<script src="@routes.Assets.versioned("javascripts/generatesecretkey.js")" type="text/javascript"></script>
+
+ 	@b4.select( formoauthclient("oauthUserId"), options = oauthUserList, '_label -> "アプリケーション" )
+	@b4.inputWrapped( "text", formoauthclient("clientSecret"), '_label -> "シークレット", 'id -> "input-secrectkey" ){input =>
+		<div class="input-group">
+		@input
+		<div class="input-group-btn">
+			<button type="button" class="btn btn-secondary" id="generate-secrectkey-button" tabindex="-1">自動生成</button>
+		</div>
+		</div>
+	}
+	@b4.text( formoauthclient("redirectUri"), '_label -> "リダイレクト先", 'placeholder -> "http://xxx.xxxx" )
+	@b4.select( formoauthclient("grantType"), options = utilities.ViewHelper.makeOptionSeq(utilities.oauth.GrantType.typeSeq, "view.oauthclient.granttype", messages), '_label -> "Grant Type" )
+  

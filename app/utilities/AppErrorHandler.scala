@@ -10,6 +10,9 @@ class AppErrorHandler extends HttpErrorHandler {
 
   def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
     Logger.debug("onClientError")
+    Logger.debug(request.toString())
+    Logger.debug(statusCode.toString())
+    Logger.debug(message)
     Future.successful(
         //Ok(errors.views.html.404notfound())
       //Status(statusCode)("A client error occurred: " + message)
@@ -19,6 +22,9 @@ class AppErrorHandler extends HttpErrorHandler {
 
   def onServerError(request: RequestHeader, exception: Throwable) = {
     Logger.debug("server error")
+    Logger.debug(request.toString())
+    Logger.debug(exception.getMessage)
+    Logger.debug(exception.toString())
     Future.successful(
       InternalServerError("A server error occurred: " + exception.getMessage)
     )

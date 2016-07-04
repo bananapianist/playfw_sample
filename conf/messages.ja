@@ -79,3 +79,11 @@ view.contract.status.Active=有効
 view.contract.status.Approval=仮認証
 view.contract.status.Stopped=停止
 view.contract.status.InActive=無効
+
+view.oauthclient.granttype.authorization_code=Authorization Code
+view.oauthclient.granttype.client_credentials=Client Credentials
+view.oauthclient.granttype.refresh_token=Refresh Token
+view.oauthclient.granttype.implicit=Implicit
+view.oauthclient.granttype.password=Password
+view.oauthclient.granttype.JWTBearer=JWT Bearer
+
